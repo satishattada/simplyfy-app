@@ -1,9 +1,20 @@
-
 import "./App.css";
+import { Store } from "./providers";
 import RoutesContainer from "./routes/routes";
 
-function App() {
-  return <RoutesContainer />;
+interface Props {
+  config: any;
+}
+function App({ config }: Props) {
+  return (
+    <Store
+      data={{
+        config,
+      }}
+    >
+      <RoutesContainer />
+    </Store>
+  );
 }
 
 export default App;

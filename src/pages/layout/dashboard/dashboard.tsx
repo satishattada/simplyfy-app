@@ -4,6 +4,7 @@ import { withParamsAndNavigate } from "../../../routes/with-params-navigate";
 import Table from "react-bootstrap/Table";
 import { Form, InputGroup, Button } from "react-bootstrap";
 import { FaSearch, FaTimes } from "react-icons/fa";
+import SearchComponent from "../search/searchComponent";
 interface Request {
   id: string;
   dateRequested: string;
@@ -16,8 +17,7 @@ interface Request {
   status: string;
 }
 function Dashboard() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [data, setData] = useState<Request[]>([
+  const data: Request[] = [
     {
       id: "1",
       dateRequested: "01-Dec-2024",
@@ -51,61 +51,34 @@ function Dashboard() {
       duration: "9 months",
       status: "Closed",
     },
-  ]);
-
-  const handleSearchChange = (e: any) => {
-    setSearchQuery(e.target.value);
+  ];
+  const [query, setQuery] = useState<string>("");
+  const [filteredData, setFilteredData] = useState<Request[]>(data);
+  const handleSearchChange = (query: string) => {
+    setQuery(query);
+    if (query === "" || query === undefined) {
+      setFilteredData(data); // Show all data if the search query is empty
+    } else {
+      // Filter data based on the query
+      const filtered = data.filter(
+        (item) =>
+          item.dateRequested.includes(query) ||
+          item.requestedBy?.toLowerCase().includes(query?.toLowerCase()) ||
+          item.skills?.toLowerCase().includes(query?.toLowerCase()) ||
+          item.status?.toLowerCase().includes(query?.toLowerCase()) ||
+          item.appName?.toLowerCase().includes(query?.toLowerCase()) ||
+          item.location?.toLowerCase().includes(query?.toLowerCase()) ||
+          item.roll?.toLowerCase().includes(query?.toLowerCase()) ||
+          item.duration?.toLowerCase().includes(query?.toLowerCase()) ||
+          item.status?.toLowerCase().includes(query?.toLowerCase())
+      );
+      setFilteredData(filtered); 
+    }
   };
 
-  const filteredData = data.filter((item) => {
-    const query = searchQuery.toLowerCase();
-    return (
-      item.dateRequested.includes(query) ||
-      item.requestedBy.toLowerCase().includes(query) ||
-      item.skills.toLowerCase().includes(query) ||
-      item.status.toLowerCase().includes(query) ||
-      item.appName.toLowerCase().includes(query) ||
-      item.location.toLowerCase().includes(query) ||
-      item.roll.toLowerCase().includes(query) ||
-      item.duration.toLowerCase().includes(query) ||
-      item.status.toLowerCase().includes(query)
-    );
-  });
-  const handleClearSearch = () => {
-    setSearchQuery(""); // Clears the input field
-  };
   return (
     <>
-      <div className="row mt-5 mb-4">
-        <div className="col-md-5">
-          <InputGroup>
-            <Form.Control
-              type="text"
-              placeholder="Search..."
-              value={searchQuery}
-              onChange={handleSearchChange}
-            />
-
-            {searchQuery ? (
-              <Button
-                variant="outline-secondary"
-                onClick={handleClearSearch}
-                className="input-clear-btn btn-outline"
-              >
-                <FaTimes />
-              </Button>
-            ) : (
-              <Button
-                variant="outline-secondary"
-                className="btn-outline"
-                onClick={handleSearchChange}
-              >
-                <FaSearch />
-              </Button>
-            )}
-          </InputGroup>
-        </div>
-      </div>
+      <SearchComponent onSearch={handleSearchChange} />
       <Table>
         <thead>
           <tr>

@@ -2,6 +2,10 @@ import { Outlet } from "react-router-dom";
 import { withParamsAndNavigate } from "../../routes/with-params-navigate";
 
 import { useState, useEffect } from "react";
+import "./styles.css";
+import HeaderComponent from "./headerComponent";
+import Dashboard from "./dashboard/dashboard";
+import { Container } from "react-bootstrap";
 
 const Layout = (props: any) => {
   // const {
@@ -21,11 +25,12 @@ const Layout = (props: any) => {
   };
 
   return (
-    <div className="layout-container">
-      <div className="page-container">
+    <>
+      <HeaderComponent />
+      <Container fluid="md" className="page-container">
         <Outlet />
-      </div>
-    </div>
+      </Container>
+    </>
   );
 };
 

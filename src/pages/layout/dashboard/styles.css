@@ -1,7 +1,35 @@
-.container{
-    margin-left: 5px;
+* {
+  font-weight: 200;
+  font-family: serif;
 }
+
 .home-container {
-    
-    background:rgb(142 138 138 / 14%);
+
+  background: rgb(142 138 138 / 14%);
+}
+
+.input-group {
+  border: 0.5px solid;
+}
+
+.form-control,
+.btn-outline {
+  border: none !important;
+}
+
+.form-control:focus {
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.form-control:active {
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+td .rounded-btn {
+  border-radius: 50px;
+  /* Custom border-radius */
+  padding: 4px 15px;
+  /* Adjust button padding if necessary */
 }

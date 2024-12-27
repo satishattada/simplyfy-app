@@ -1,0 +1,21 @@
+
+.inputFieldcontainer {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1)
+}
+
+.inputFieldLabelStyle {
+   font-weight: bold;
+   font-size: 16px;
+   margin-bottom: 10px;
+}
+.inputStyle{
+    width: 100%; 
+    height: 40px; 
+    /* padding: 10px;  */
+    font-size: 16px; 
+    border-radius: 5px; 
+    border: 1px solid #ccc;
+}

@@ -4,6 +4,7 @@ import Table from "react-bootstrap/Table";
 import { Form, InputGroup, Button } from "react-bootstrap";
 import { FaSearch, FaTimes } from "react-icons/fa";
 import SearchComponent from "../search/searchComponent";
+import AddTeamModal from "../addTeamModal/addTeamModal";
 interface Request {
   infyId: string;
   infyEmail: string;
@@ -86,6 +87,9 @@ function TeamViewComponent() {
   ];
   const [query, setQuery] = useState<string>("");
   const [filteredData, setFilteredData] = useState<Request[]>(data);
+  const [showModal, setShowModal] = useState<boolean>(false);
+
+  const handleToggleModel = () => { setShowModal(!showModal) }
   const handleSearchChange = (query: string) => {
     setQuery(query);
     if (query === "" || query === undefined) {
@@ -112,9 +116,10 @@ function TeamViewComponent() {
 
   return (
     <>
+    <AddTeamModal showModal={showModal} onClose={()=>handleToggleModel()}/>
     <div className="d-flex justify-content-between mt-5 mb-4">
       <SearchComponent onSearch={handleSearchChange} />
-      <i className="bi bi-plus-circle edit-btn"></i>
+      <i className="bi bi-plus-circle edit-btn" onClick={() => handleToggleModel()}></i>
       </div>  
       <Table>
         <thead>

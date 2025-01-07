@@ -1,0 +1,10 @@
+.inputField{
+    width: 33%; 
+    margin-bottom: 20px; 
+    padding: 10px;   
+}
+.modalContent{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }

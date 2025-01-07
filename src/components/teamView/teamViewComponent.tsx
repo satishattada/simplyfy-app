@@ -65,7 +65,7 @@ function TeamViewComponent() {
           infyId: "23543",
           infyEmail: "adhavan.s_g@infosys.com",
           location: "Bangalore",
-          skills: "React,Node,Python,React,Node,Python",
+          skills: "React,Node,Python",
           PU: "BP",
           startDate: "13-Jan-2024",
           endDate: "22-Sept-2025",
@@ -97,7 +97,9 @@ function TeamViewComponent() {
           item.infyId.includes(query) ||
           item.infyEmail?.toLowerCase().includes(query?.toLowerCase()) ||
           item.location?.toLowerCase().includes(query?.toLowerCase()) ||
-          item.skills?.toLowerCase().includes(query?.toLowerCase()) ||
+          item.skills?.split(",").some((skill) =>
+            skill.trim().toLowerCase().includes(query?.toLowerCase())
+          ) ||
           item.PU?.toLowerCase().includes(query?.toLowerCase()) ||
           item.startDate?.toLowerCase().includes(query?.toLowerCase()) ||
           item.endDate?.toLowerCase().includes(query?.toLowerCase()) ||

@@ -63,7 +63,9 @@ function DemandView() {
         (item) =>
           item.dateRequested.includes(query) ||
           item.requestedBy?.toLowerCase().includes(query?.toLowerCase()) ||
-          item.skills?.toLowerCase().includes(query?.toLowerCase()) ||
+          item.skills?.split(",").some((skill) =>
+            skill.trim().toLowerCase().includes(query?.toLowerCase())
+          ) ||
           item.status?.toLowerCase().includes(query?.toLowerCase()) ||
           item.appName?.toLowerCase().includes(query?.toLowerCase()) ||
           item.location?.toLowerCase().includes(query?.toLowerCase()) ||

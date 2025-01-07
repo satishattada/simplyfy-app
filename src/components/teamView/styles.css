@@ -1,19 +1,37 @@
 td .rounded-btn {
-    border-radius: 50px;
-    /* Custom border-radius */
-    padding: 4px 15px;
-    color: green;
-    /* Adjust button padding if necessary */
-  }
-  .edit-btn{
-    margin-right: 35px;
-    font-size: 28px;
-    color: green;
+  border-radius: 50px;
+  /* Custom border-radius */
+  padding: 4px 15px;
+  color: green;
+  /* Adjust button padding if necessary */
 }
+
+.edit-btn {
+  margin-right: 35px;
+  font-size: 28px;
+  color: green;
+}
+
 td {
-    max-width: 150px; /* Set max width to control wrapping */
-    overflow-wrap: break-word; /* Ensure long words break */
-  }
-  thead td{
-    font-weight: 600;
-  }
+  max-width: 150px;
+  /* Set max width to control wrapping */
+  overflow-wrap: break-word;
+  /* Ensure long words break */
+}
+
+tbody td {
+  text-align: center;
+  /* Horizontally center the content */
+  vertical-align: middle;
+  /* Vertically center the content */
+  height: 60px;
+}
+
+thead tr {
+  text-align: center;
+  vertical-align: middle;
+}
+
+thead td {
+  font-weight: 600;
+}

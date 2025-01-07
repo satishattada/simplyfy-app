@@ -4,131 +4,37 @@ import { withParamsAndNavigate } from "../../../routes/with-params-navigate";
 import Table from "react-bootstrap/Table";
 import { Form, InputGroup, Button } from "react-bootstrap";
 import { FaSearch, FaTimes } from "react-icons/fa";
-import SearchComponent from "../search/searchComponent";
-interface Request {
-  id: string;
-  dateRequested: string;
-  requestedBy: string;
-  appName: string;
-  location: string;
-  skills: string;
-  roll: string;
-  duration: string;
-  status: string;
-}
+import SearchComponent from "../../../components/search/searchComponent";
+import { useNavigate } from 'react-router-dom';
+import demand from '../../../assets/icons/demand.jpg';
+import team from '../../../assets/icons/team.jpg';
+import finance from '../../../assets/icons/finance.jpg'
 function Dashboard() {
-  const data: Request[] = [
-    {
-      id: "1",
-      dateRequested: "01-Dec-2024",
-      requestedBy: "Chiranjeevi",
-      appName: "App 1",
-      location: "London",
-      skills: "JavaScript",
-      roll: "Developer",
-      duration: "6 months",
-      status: "Open",
-    },
-    {
-      id: "2",
-      dateRequested: "11-Dec-2024",
-      requestedBy: "Rahim",
-      appName: "App 2",
-      location: "Pune",
-      skills: "React, Node",
-      roll: "Developer",
-      duration: "3 months",
-      status: "Open",
-    },
-    {
-      id: "3",
-      dateRequested: "20-Dec-2024",
-      requestedBy: "Chiranjeevi",
-      appName: "App 3",
-      location: "Pune",
-      skills: "Angular",
-      roll: "Developer",
-      duration: "9 months",
-      status: "Closed",
-    },
+  const navigate = useNavigate();
+  const cards = [
+    { id: 1, path: "demand-management", description: "Demand Management", image: `${demand}` },
+    { id: 2, path: "team-management", description: "Team Management", image: `${team}` },
+    { id: 3, path: "finance-management", description: "Finance Management", image: `${finance}` },
   ];
-  const [query, setQuery] = useState<string>("");
-  const [filteredData, setFilteredData] = useState<Request[]>(data);
-  const handleSearchChange = (query: string) => {
-    setQuery(query);
-    if (query === "" || query === undefined) {
-      setFilteredData(data); // Show all data if the search query is empty
-    } else {
-      // Filter data based on the query
-      const filtered = data.filter(
-        (item) =>
-          item.dateRequested.includes(query) ||
-          item.requestedBy?.toLowerCase().includes(query?.toLowerCase()) ||
-          item.skills?.toLowerCase().includes(query?.toLowerCase()) ||
-          item.status?.toLowerCase().includes(query?.toLowerCase()) ||
-          item.appName?.toLowerCase().includes(query?.toLowerCase()) ||
-          item.location?.toLowerCase().includes(query?.toLowerCase()) ||
-          item.roll?.toLowerCase().includes(query?.toLowerCase()) ||
-          item.duration?.toLowerCase().includes(query?.toLowerCase()) ||
-          item.status?.toLowerCase().includes(query?.toLowerCase())
-      );
-      setFilteredData(filtered); 
-    }
+  const handleCardClick: any = (path: string) => {
+    navigate(`${path}`);
   };
-
   return (
     <>
-      <SearchComponent onSearch={handleSearchChange} />
-      <Table>
-        <thead>
-          <tr>
-            <td>ID</td>
-            <td>Date Requested</td>
-            <td>Requested By</td>
-            <td>App Name</td>
-            <td>Location</td>
-            <td>Skills</td>
-            <td>Roll</td>
-            <td>Duration</td>
-            <td>Status</td>
-            <td>Action</td>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredData.length > 0 ? (
-            filteredData.map((request) => (
-              <tr key={request.id}>
-                <td>{request.id}</td>
-                <td>{request.dateRequested}</td>
-                <td>{request.requestedBy}</td>
-                <td>{request.appName}</td>
-                <td>{request.location}</td>
-                <td>{request.skills}</td>
-                <td>{request.roll}</td>
-                <td>{request.duration}</td>
-                <td>{request.status}</td>
-                <td>
-                  <Button
-                    variant="outline-secondary"
-                    size="sm"
-                    className="rounded-btn"
-                  >
-                    Edit
-                  </Button>
-                </td>
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan={9} className="text-center">
-                No matching data found
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </Table>
+      <div className="d-flex justify-content-around mt-5">
+        {cards.map((card) => (
+          <div className="card" onClick={() => handleCardClick(card.path)} key={card.id}>
+            <img src={card.image} className="card-img-top" alt="..." />
+            <div className="card-body">
+              <p className="card-text">
+               {card.description} 
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
     </>
   );
 }
 
-export default withParamsAndNavigate(Dashboard);
+export default Dashboard;

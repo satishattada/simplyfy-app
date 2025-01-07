@@ -7,6 +7,7 @@ import Login from "../pages/login/login";
 import DemandManagement from "../pages/layout/demandManagement/demandManagement";
 import TeamManagement from "../pages/layout/teamManagement/teamManagement";
 import FinanceManagement from "../pages/layout/financeManagement/financeManagement";
+import DemandView from "../components/demandView/demandView";
 
 
 function RoutesContainer() {

@@ -8,16 +8,10 @@ import Dashboard from "./dashboard/dashboard";
 import { Container } from "react-bootstrap";
 
 const Layout = (props: any) => {
-  // const {
-  //   usersData,
-  //   appAction } = props;
-  // const [users, setUsers] = useState([]);
+ 
 
   // Similar to componentDidMount and componentDidUpdate:
   useEffect(() => {
-    // appAction.getUsers().then(() => {
-    //   setUsers(usersData);
-    // });
   }, []);
 
   const navigate = () => {
@@ -27,6 +21,7 @@ const Layout = (props: any) => {
   return (
     <>
       <HeaderComponent />
+      <div className="d-flex justify-content-center mt-2 h5">Team Management</div>
       <Container fluid="md" className="page-container">
         <Outlet />
       </Container>

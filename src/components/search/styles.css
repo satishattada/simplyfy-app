@@ -1,7 +1,10 @@
 .input-group {
     border: 0.5px solid;
+   
   }
-  
+  .search-box .input-group{
+    width: 125%;
+  }
   .input-group .form-control,
   .input-group .btn-outline {
     border: none;

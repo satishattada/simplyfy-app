@@ -1,0 +1,19 @@
+td .rounded-btn {
+    border-radius: 50px;
+    /* Custom border-radius */
+    padding: 4px 15px;
+    color: green;
+    /* Adjust button padding if necessary */
+  }
+  .edit-btn{
+    margin-right: 35px;
+    font-size: 28px;
+    color: green;
+}
+td {
+    max-width: 150px; /* Set max width to control wrapping */
+    overflow-wrap: break-word; /* Ensure long words break */
+  }
+  thead td{
+    font-weight: 600;
+  }

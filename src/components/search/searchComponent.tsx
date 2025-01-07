@@ -8,7 +8,7 @@ interface SearchBoxProps {
 const SearchComponent: React.FC<SearchBoxProps> = ({ onSearch }) => {
   const [searchQuery, setSearchQuery] = useState("");
 
-  const handleSearchChange = (e: any) => {
+  const handleSearchField = (e: any) => {
     setSearchQuery(e.target.value);
     onSearch(e.target.value);
   };
@@ -21,14 +21,13 @@ const SearchComponent: React.FC<SearchBoxProps> = ({ onSearch }) => {
   };
   return (
     <>
-      <div className="row mt-5 mb-4">
-        <div className="col-md-5">
+        <div className="search-box">
           <InputGroup>
             <Form.Control
               type="text"
               placeholder="Search..."
               value={searchQuery}
-              onChange={handleSearchChange}
+              onChange={handleSearchField}
             />
 
             {searchQuery ? (
@@ -43,14 +42,13 @@ const SearchComponent: React.FC<SearchBoxProps> = ({ onSearch }) => {
               <Button
                 variant="outline-secondary"
                 className="btn-outline"
-                onClick={handleSearchChange}
+                onClick={handleSearchField}
               >
                 <FaSearch />
               </Button>
             )}
           </InputGroup>
         </div>
-      </div>
     </>
   );
 };

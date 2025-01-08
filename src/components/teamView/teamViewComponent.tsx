@@ -5,7 +5,9 @@ import { Form, InputGroup, Button } from "react-bootstrap";
 import { FaSearch, FaTimes } from "react-icons/fa";
 import SearchComponent from "../search/searchComponent";
 import AddTeamModal from "../addTeamModal/addTeamModal";
-interface Request {
+import { withParamsAndNavigate } from "../../routes/with-params-navigate";
+import teamService from "../../services/teamService";
+interface TeamReq {
   infyId: string;
   infyEmail: string;
   location: string;
@@ -17,110 +19,62 @@ interface Request {
   mission: string;
 }
 function TeamViewComponent() {
-  const data: Request[] = [
-    {
-      infyId: "764576",
-      infyEmail: "pallavi.bhadange@infosys.com",
-      location: "Pune",
-      skills: "React,Node,Angular",
-      PU: "BP",
-      startDate: "22-Dec-2023",
-      endDate: "14-Aug-2022",
-      bpSponsorEmail: "pallavi.bhadange@bp.com",
-      mission: "Consumer",
-    },
-    {
-        infyId: "23453",
-        infyEmail: "adhavan.s_g@infosys.com",
-        location: "Baglore",
-        skills: "React,Node,Python",
-        PU: "BP",
-        startDate: "13-Jan-2024",
-        endDate: "22-Sept-2025",
-        bpSponsorEmail: "adhavan.s_g@bp.com",
-        mission: "Consumer",
-    },
-    {
-        infyId: "762345",
-        infyEmail: "satish.attada@infosys.com",
-        location: "London",
-        skills: "React,Node,AWS",
-        PU: "BP",
-        startDate: "24-Aug-2023",
-        endDate: "14-Dec-2025",
-        bpSponsorEmail: "satish.attada@bp.com",
-        mission: "Consumer",
-    },
-    {
-        infyId: "764976",
-        infyEmail: "pallavi.bhadange@infosys.com",
-        location: "Pune",
-        skills: "React,Node,Angular",
-        PU: "BP",
-        startDate: "22-Dec-2023",
-        endDate: "14-Aug-2022",
-        bpSponsorEmail: "pallavi.bhadange@bp.com",
-        mission: "Consumer",
-      },
-      {
-          infyId: "23543",
-          infyEmail: "adhavan.s_g@infosys.com",
-          location: "Bangalore",
-          skills: "React,Node,Python",
-          PU: "BP",
-          startDate: "13-Jan-2024",
-          endDate: "22-Sept-2025",
-          bpSponsorEmail: "adhavan.s_g@bp.com",
-          mission: "Consumer",
-      },
-      {
-          infyId: "722345",
-          infyEmail: "satish.attada@infosys.com",
-          location: "London",
-          skills: "React,Node,AWS",
-          PU: "BP",
-          startDate: "24-Aug-2023",
-          endDate: "14-Dec-2025",
-          bpSponsorEmail: "satish.attada@bp.com",
-          mission: "Consumer",
-      },
-  ];
   const [query, setQuery] = useState<string>("");
-  const [filteredData, setFilteredData] = useState<Request[]>(data);
+  const [filteredData, setFilteredData] = useState<TeamReq[] | undefined>(
+    undefined
+  );
+  const [teamData, setTeamData] = useState<TeamReq[] | undefined>(undefined);
   const [showModal, setShowModal] = useState<boolean>(false);
 
-  const handleToggleModel = () => { setShowModal(!showModal) }
-  const handleSearchChange = (query: string) => {
-    setQuery(query);
+  const handleToggleModel = () => {
+    setShowModal(!showModal);
+  };
+  useEffect(() => {
+    teamService
+      .getTeamData()
+      .then((resp) => setTeamData(resp as TeamReq[]))
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
+  useEffect(() => {
     if (query === "" || query === undefined) {
-      setFilteredData(data); // Show all data if the search query is empty
+      setFilteredData(teamData); // Show all data if the search query is empty
     } else {
       // Filter data based on the query
-      const filtered = data.filter(
+      const filtered = teamData?.filter(
         (item) =>
           item.infyId.includes(query) ||
           item.infyEmail?.toLowerCase().includes(query?.toLowerCase()) ||
           item.location?.toLowerCase().includes(query?.toLowerCase()) ||
-          item.skills?.split(",").some((skill) =>
-            skill.trim().toLowerCase().includes(query?.toLowerCase())
-          ) ||
+          item.skills
+            ?.split(",")
+            .some((skill) =>
+              skill.trim().toLowerCase().includes(query?.toLowerCase())
+            ) ||
           item.PU?.toLowerCase().includes(query?.toLowerCase()) ||
           item.startDate?.toLowerCase().includes(query?.toLowerCase()) ||
           item.endDate?.toLowerCase().includes(query?.toLowerCase()) ||
           item.bpSponsorEmail?.toLowerCase().includes(query?.toLowerCase()) ||
           item.mission?.toLowerCase().includes(query?.toLowerCase())
       );
-      setFilteredData(filtered); 
+      setFilteredData(filtered);
     }
+  }, [teamData, query]);
+  const handleSearchChange = (query: string) => {
+    setQuery(query);
   };
 
   return (
     <>
-    <AddTeamModal showModal={showModal} onClose={()=>handleToggleModel()}/>
-    <div className="d-flex justify-content-between mt-5 mb-4">
-      <SearchComponent onSearch={handleSearchChange} />
-      <i className="bi bi-plus-circle edit-btn" onClick={() => handleToggleModel()}></i>
-      </div>  
+      <AddTeamModal showModal={showModal} onClose={() => handleToggleModel()} />
+      <div className="d-flex justify-content-between mt-5 mb-4">
+        <SearchComponent onSearch={handleSearchChange} />
+        <i
+          className="bi bi-plus-circle edit-btn"
+          onClick={() => handleToggleModel()}
+        ></i>
+      </div>
       <Table>
         <thead>
           <tr>
@@ -137,8 +91,8 @@ function TeamViewComponent() {
           </tr>
         </thead>
         <tbody>
-          {filteredData.length > 0 ? (
-            filteredData.map((request) => (
+          {filteredData && filteredData?.length > 0 ? (
+            filteredData?.map((request) => (
               <tr key={request.infyId}>
                 <td>{request.infyId}</td>
                 <td>{request.infyEmail}</td>
@@ -173,4 +127,4 @@ function TeamViewComponent() {
   );
 }
 
-export default TeamViewComponent;
+export default withParamsAndNavigate(TeamViewComponent);

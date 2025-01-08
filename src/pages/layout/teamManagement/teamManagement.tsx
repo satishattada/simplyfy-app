@@ -1,7 +1,8 @@
 
 import TeamViewComponent from '../../../components/teamView/teamViewComponent';
 import './styles.css';
-
-export default function TeamManagement() {
+import { withParamsAndNavigate } from "../../../routes/with-params-navigate";
+function TeamManagement() {
   return <><TeamViewComponent /></>;
 }
+export default (withParamsAndNavigate(TeamManagement))

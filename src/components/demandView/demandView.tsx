@@ -77,9 +77,13 @@ function DemandView() {
     }
   };
 
+
   return (
     <>
+    <div className="d-flex justify-content-between mt-5 mb-4">
       <SearchComponent onSearch={handleSearchChange} />
+      <i className="bi bi-plus-circle edit-btn"></i>
+      </div>  
       <Table>
         <thead>
           <tr>

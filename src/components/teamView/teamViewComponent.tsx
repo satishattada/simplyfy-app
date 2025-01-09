@@ -7,23 +7,15 @@ import SearchComponent from "../search/searchComponent";
 import AddTeamModal from "../addTeamModal/addTeamModal";
 import { withParamsAndNavigate } from "../../routes/with-params-navigate";
 import teamService from "../../services/teamService";
-interface TeamReq {
-  infyId: string;
-  infyEmail: string;
-  location: string;
-  skills: string;
-  PU: string;
-  startDate: string;
-  endDate: string;
-  bpSponsorEmail: string;
-  mission: string;
-}
+import { teamDataAtom, TeamReq } from "../../atoms/teamAtoms";
+import { useAtom } from "jotai";
+
 function TeamViewComponent() {
   const [query, setQuery] = useState<string>("");
   const [filteredData, setFilteredData] = useState<TeamReq[] | undefined>(
     undefined
   );
-  const [teamData, setTeamData] = useState<TeamReq[] | undefined>(undefined);
+  const [teamData, setTeamData] = useAtom(teamDataAtom);
   const [showModal, setShowModal] = useState<boolean>(false);
 
   const handleToggleModel = () => {
@@ -42,14 +34,14 @@ function TeamViewComponent() {
       setFilteredData(teamData); // Show all data if the search query is empty
     } else {
       // Filter data based on the query
-      const filtered = teamData?.filter(
-        (item) =>
+      const filtered = teamData && teamData?.filter(
+        (item: any) =>
           item.infyId.includes(query) ||
           item.infyEmail?.toLowerCase().includes(query?.toLowerCase()) ||
           item.location?.toLowerCase().includes(query?.toLowerCase()) ||
           item.skills
             ?.split(",")
-            .some((skill) =>
+            .some((skill: string) =>
               skill.trim().toLowerCase().includes(query?.toLowerCase())
             ) ||
           item.PU?.toLowerCase().includes(query?.toLowerCase()) ||

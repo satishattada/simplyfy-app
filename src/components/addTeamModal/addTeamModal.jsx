@@ -3,7 +3,8 @@ import { Modal, Button } from "react-bootstrap";
 import InputField from "../inputField/inputField";
 import SelectField from "../selectField/selectField";
 import "./styles.css";
-
+import { useAtom } from "jotai";
+import { teamDataAtom } from "../../atoms/teamAtoms";
 const AddTeamModal = ({ showModal, onClose }) => {
   const [productName, setProductName] = useState("");
   const [pu, setPU] = useState("");
@@ -21,7 +22,23 @@ const AddTeamModal = ({ showModal, onClose }) => {
   const [contractType, setContractType] = useState("");
   const [rate, setRate] = useState("");
   const [backupResource, setBackupResource] = useState("");
-
+const [teamData, setTeamData] = useAtom(teamDataAtom);
+  const onSaveChanges =() =>{
+    const newData ={
+      infyId: candidateEmpId,
+      infyEmail: candidateEmail,
+      location: location,
+      skills,
+      PU: pu,
+      startDate,
+      endDate,
+      bpSponsorEmail: bpSponserEmail,
+      mission
+    }
+    console.log("teamData............",teamData);
+    setTeamData([...teamData, newData]);
+    onClose();
+  }
   return (
     <Modal
       show={showModal}
@@ -186,7 +203,7 @@ const AddTeamModal = ({ showModal, onClose }) => {
         <Button variant="secondary" onClick={() => onClose()}>
           Close
         </Button>
-        <Button variant="primary" onClick={() => onClose()}>
+        <Button variant="primary" onClick={() => onSaveChanges()}>
           Save Changes
         </Button>
       </Modal.Footer>

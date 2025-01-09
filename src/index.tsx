@@ -5,6 +5,8 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
+import { TeamReq } from "./atoms/teamAtoms";
+import { atom } from "jotai";
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );

@@ -2,17 +2,16 @@ import "./App.css";
 import { Store } from "./providers";
 import RoutesContainer from "./routes/routes";
 import { TeamReq } from './atoms/teamAtoms';
+import { PrimitiveAtom } from "jotai";
 interface Props {
   config: any;
-  teamDataAtom: TeamReq;
   
 }
-function App({ config, teamDataAtom }: Props) {
+function App({ config }: Props) {
   return (
     <Store
       data={{
         config,
-        teamDataAtom,
       }}
     >
       <RoutesContainer />

@@ -8,6 +8,13 @@ interface teamReq {
     endDate: string;
     bpSponsorEmail: string;
     mission: string;
+    productName:string,
+    workType:string,
+    workScope:string,
+    allocation:string,
+    contractType:string,
+    rate:string,
+    backupResource:string,
   }
 
 const teamData: teamReq[] = [
@@ -17,11 +24,17 @@ const teamData: teamReq[] = [
         location: "Pune",
         skills: "React,Node,Angular",
         PU: "BP",
-        startDate: "22-Dec-2023",
-        endDate: "14-Aug-2022",
+        startDate: "2025-01-23",
+        endDate: "2025-01-30",
         bpSponsorEmail: "pallavi.bhadange@bp.com",
         mission: "Consumer",
-        
+        productName: "Project Management Tool",
+        workType: "OPEX",
+        workScope: "OpsDev",
+        allocation: "80%",
+        contractType: "Permanent",
+        rate: "50 USD/hour",
+        backupResource: "John Doe"
     },
     {
         infyId: "23453",
@@ -33,6 +46,13 @@ const teamData: teamReq[] = [
         endDate: "22-Sept-2025",
         bpSponsorEmail: "adhavan.s_g@bp.com",
         mission: "Consumer",
+        productName: "Project Management Tool",
+        workType: "OPEX",
+        workScope: "OpsDev",
+        allocation: "80%",
+        contractType: "Permanent",
+        rate: "50 USD/hour",
+        backupResource: "John Doe"
     },
     {
         infyId: "762345",
@@ -44,6 +64,13 @@ const teamData: teamReq[] = [
         endDate: "14-Dec-2025",
         bpSponsorEmail: "satish.attada@bp.com",
         mission: "Consumer",
+        productName: "Project Management Tool",
+        workType: "OPEX",
+        workScope: "OpsDev",
+        allocation: "80%",
+        contractType: "Permanent",
+        rate: "50 USD/hour",
+        backupResource: "John Doe"
     },
     {
         infyId: "764976",
@@ -55,6 +82,13 @@ const teamData: teamReq[] = [
         endDate: "14-Aug-2022",
         bpSponsorEmail: "pallavi.bhadange@bp.com",
         mission: "Consumer",
+        productName: "Project Management Tool",
+        workType: "OPEX",
+        workScope: "OpsDev",
+        allocation: "80%",
+        contractType: "Permanent",
+        rate: "50 USD/hour",
+        backupResource: "John Doe"
       },
       {
           infyId: "23543",
@@ -66,6 +100,13 @@ const teamData: teamReq[] = [
           endDate: "22-Sept-2025",
           bpSponsorEmail: "adhavan.s_g@bp.com",
           mission: "Consumer",
+          productName: "Project Management Tool",
+          workType: "OPEX",
+          workScope: "OpsDev",
+          allocation: "80%",
+          contractType: "Permanent",
+          rate: "50 USD/hour",
+          backupResource: "John Doe"
       },
       {
           infyId: "722345",
@@ -77,6 +118,13 @@ const teamData: teamReq[] = [
           endDate: "14-Dec-2025",
           bpSponsorEmail: "satish.attada@bp.com",
           mission: "Consumer",
+          productName: "Project Management Tool",
+          workType: "OPEX",
+          workScope: "OpsDev",
+          allocation: "80%",
+          contractType: "Permanent",
+          rate: "50 USD/hour",
+          backupResource: "John Doe"
       },
   ];
   const getTeamData = () => {

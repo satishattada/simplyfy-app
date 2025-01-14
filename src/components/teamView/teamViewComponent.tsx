@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./styles.css";
 import Table from "react-bootstrap/Table";
+import { Pagination } from 'react-bootstrap';
 import { Form, InputGroup, Button } from "react-bootstrap";
 import { FaSearch, FaTimes } from "react-icons/fa";
 import SearchComponent from "../search/searchComponent";
@@ -9,8 +10,11 @@ import { withParamsAndNavigate } from "../../routes/with-params-navigate";
 import teamService from "../../services/teamService";
 import { teamDataAtom, TeamReq } from "../../atoms/teamAtoms";
 import { useAtom } from "jotai";
-
+import { CSVLink } from 'react-csv';
 function TeamViewComponent() {
+  const itemsPerPage = 5;
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
   const [query, setQuery] = useState<string>("");
   const [filteredData, setFilteredData] = useState<TeamReq[] | undefined>(
     undefined
@@ -24,14 +28,21 @@ function TeamViewComponent() {
   useEffect(() => {
     teamService
       .getTeamData()
-      .then((resp) => setTeamData(resp as TeamReq[]))
+      .then((resp) => {
+        const reponse = resp as TeamReq[];
+        setTeamData(reponse)
+        setTotalItems(reponse.length);
+        
+     }) //set item count
       .catch((err) => {
         console.log(err);
       });
   }, []);
   useEffect(() => {
     if (query === "" || query === undefined) {
-      setFilteredData(teamData); // Show all data if the search query is empty
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      const currentItems = teamData.slice(startIndex, startIndex + itemsPerPage);
+      setFilteredData(currentItems); // Show all data if the search query is empty
     } else {
       // Filter data based on the query
       const filtered = teamData && teamData?.filter(
@@ -50,22 +61,34 @@ function TeamViewComponent() {
           item.bpSponsorEmail?.toLowerCase().includes(query?.toLowerCase()) ||
           item.mission?.toLowerCase().includes(query?.toLowerCase())
       );
-      setFilteredData(filtered);
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      const currentItems = filtered.slice(startIndex, startIndex + itemsPerPage);
+      console.log("inside currentItems...........",currentItems);
+      setFilteredData(currentItems);
     }
-  }, [teamData, query]);
+  }, [teamData, query, currentPage]);
   const handleSearchChange = (query: string) => {
     setQuery(query);
   };
-
+  const handlePageChange = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+  };
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
   return (
     <>
       <AddTeamModal showModal={showModal} onClose={() => handleToggleModel()} />
       <div className="d-flex justify-content-between mt-5 mb-4">
         <SearchComponent onSearch={handleSearchChange} />
+        <div>
         <i
           className="bi bi-plus-circle edit-btn"
           onClick={() => handleToggleModel()}
         ></i>
+         <CSVLink data={teamData}  filename="employee-details.csv" target="_blank">
+         <i className="bi bi-filetype-csv export-btn"></i>
+        </CSVLink>
+       
+       </div>
       </div>
       <Table>
         <thead>
@@ -115,6 +138,23 @@ function TeamViewComponent() {
           )}
         </tbody>
       </Table>
+      <Pagination>
+        <Pagination.Prev
+          onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
+        />
+        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+          <Pagination.Item
+            key={page}
+            active={page === currentPage}
+            onClick={() => handlePageChange(page)}
+          >
+            {page}
+          </Pagination.Item>
+        ))}
+        <Pagination.Next
+          onClick={() => handlePageChange(Math.min(currentPage + 1, totalPages))}
+        />
+      </Pagination>
     </>
   );
 }

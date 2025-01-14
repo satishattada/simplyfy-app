@@ -43,7 +43,7 @@ const [teamData, setTeamData] = useAtom(teamDataAtom);
     <Modal
       show={showModal}
       onHide={() => onClose()}
-      size="xl"
+      fullscreen={true}
       aria-labelledby="contained-modal-title-vcenter"
       centered
     >

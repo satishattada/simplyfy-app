@@ -20,8 +20,8 @@ const Layout = (props: any) => {
   };
   const getCurrentPath = () => {
     switch (location.pathname) {
-      case RoutesEnum.TEAM_MANAGEMENT:
-        return 'Team Management';
+      case RoutesEnum.EMPLOYEE_MANAGEMENT:
+        return 'Employee Management';
       case RoutesEnum.FINANCE_MANAGEMENT:
         return 'Finance Management';
       case RoutesEnum.DASHBOARD:

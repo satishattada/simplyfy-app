@@ -111,7 +111,7 @@ const AddTeamModal = ({
       centered
     >
       <Modal.Header closeButton>
-        <Modal.Title>{modalType === "edit" ? "Edit Team" : "Add Team"}</Modal.Title>
+        <Modal.Title>{modalType === "edit" ? "Edit Employee" : "Add Employee"}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <div className="modalContent">

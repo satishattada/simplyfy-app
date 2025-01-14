@@ -13,7 +13,7 @@ function Dashboard() {
   const navigate = useNavigate();
   const cards = [
     { id: 1, path: "demand-management", description: "Demand Management", image: `${demand}` },
-    { id: 2, path: "team-management", description: "Team Management", image: `${team}` },
+    { id: 2, path: "employee-management", description: "Employee Management", image: `${team}` },
     { id: 3, path: "finance-management", description: "Finance Management", image: `${finance}` },
   ];
   const handleCardClick: any = (path: string) => {

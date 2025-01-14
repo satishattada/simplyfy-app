@@ -17,7 +17,7 @@ function RoutesContainer() {
         <Route path="/" element={<Layout />}>
           <Route path="/" element={<Dashboard />} />
           <Route path="/demand-management" element={<DemandManagement />} />
-          <Route path="/team-management" element={<TeamManagement />} />
+          <Route path="/employee-management" element={<TeamManagement />} />
           <Route path="/finance-management" element={<FinanceManagement />} />
         </Route>
         <Route path="*" element={<NoPage />} />

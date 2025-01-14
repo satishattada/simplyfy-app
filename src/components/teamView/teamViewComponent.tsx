@@ -20,11 +20,6 @@ function TeamViewComponent() {
   const [modalType, setModalType] = useState<string>("add");
   const [modalData, setModalData] = useState<object>({});
 
-  const handleToggleModel = () => {
-    setShowModal(!showModal);
-    setModalData({});
-    setModalType("add");
-  };
   useEffect(() => {
     teamService
       .getTeamData()
@@ -60,26 +55,41 @@ function TeamViewComponent() {
   const handleSearchChange = (query: string) => {
     setQuery(query);
   };
-  const handleEditModel = (request: any) => {
-    console.log(request,'---------edit------');
+
+  const handleCloseModel = () => {
+    setShowModal(false);
+    setModalData({});
+  };
+
+  const handleModal = (type: string, request?: any) => {
     setShowModal(true);
-    setModalData(request);
-    setModalType("edit");
-  }
+    setModalType(type);
+    switch (type) {
+      case "add":
+        setModalData({});
+        break;
+      case "edit":
+      case "view":
+        setModalData(request);
+        break;
+      default:
+        setModalData({});
+    }
+  };
 
   return (
     <>
       <AddTeamModal
         showModal={showModal}
-        onClose={() => handleToggleModel()}
+        onClose={() => handleCloseModel()}
         modalType={modalType}
-        modalData={modalType === "edit" ? modalData : undefined}
+        modalData={modalType === "edit" || modalType === "view"  ? modalData : undefined}
       />
       <div className="d-flex justify-content-between mt-5 mb-4">
         <SearchComponent onSearch={handleSearchChange} />
         <i
           className="bi bi-plus-circle edit-btn"
-          onClick={() => handleToggleModel()}
+          onClick={() => handleModal("add",{})}
         ></i>
       </div>
       <Table>
@@ -101,7 +111,12 @@ function TeamViewComponent() {
           {filteredData && filteredData?.length > 0 ? (
             filteredData?.map((request) => (
               <tr key={request.infyId}>
-                <td>{request.infyId}</td>
+                <td
+                  style={{ color: "blue", textDecoration: "underline", cursor: "pointer" }}
+                  onClick={() => handleModal("view",request)}
+                >
+                  {request.infyId}
+                </td>
                 <td>{request.infyEmail}</td>
                 <td>{request.location}</td>
                 <td>{request.skills}</td>
@@ -115,7 +130,7 @@ function TeamViewComponent() {
                     variant="outline-secondary"
                     size="sm"
                     className="rounded-btn"
-                    onClick={() => handleEditModel(request)}
+                    onClick={() => handleModal("edit",request)}
                   >
                     Edit
                   </Button>

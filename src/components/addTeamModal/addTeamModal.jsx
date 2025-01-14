@@ -6,12 +6,7 @@ import "./styles.css";
 import { useAtom } from "jotai";
 import { teamDataAtom } from "../../atoms/teamAtoms";
 
-const AddTeamModal = ({
-  showModal,
-  onClose,
-  modalType,
-  modalData = {},
-}) => {
+const AddTeamModal = ({ showModal, onClose, modalType, modalData = {} }) => {
   const [infyId, setInfyId] = useState("");
   const [infyEmail, setInfyEmail] = useState("");
   const [location, setLocation] = useState("");
@@ -31,6 +26,7 @@ const AddTeamModal = ({
   const [teamData, setTeamData] = useAtom(teamDataAtom);
 
   useEffect(() => {
+    console.log("modalData............edit/view",modalType, modalData);
     if (modalType === "edit" || modalType === "view") {
       setInfyId(modalData.infyId);
       setInfyEmail(modalData.infyEmail);
@@ -111,7 +107,13 @@ const AddTeamModal = ({
       centered
     >
       <Modal.Header closeButton>
-        <Modal.Title>{modalType === "edit" ? "Edit Team" : "Add Team"}</Modal.Title>
+        <Modal.Title>
+          {modalType === "add"
+            ? "Add Employee"
+            : modalType === "edit"
+            ? "Edit Employee"
+            : "View Employee"}
+        </Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <div className="modalContent">
@@ -121,6 +123,7 @@ const AddTeamModal = ({
               type="text"
               value={infyId}
               onChange={(e) => setInfyId(e.target.value)}
+              readOnly={modalType === "view" || modalType === "edit"}
             />
           </div>
           <div className="inputField">
@@ -129,6 +132,7 @@ const AddTeamModal = ({
               type="text"
               value={infyEmail}
               onChange={(e) => setInfyEmail(e.target.value)}
+              readOnly={modalType === "view" ||modalType ===  "edit"}
             />
           </div>
           <div className="inputField">
@@ -137,6 +141,7 @@ const AddTeamModal = ({
               type="text"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
+              readOnly={modalType === "view"}
             />
           </div>
           <div className="inputField">
@@ -145,6 +150,7 @@ const AddTeamModal = ({
               type="text"
               value={skills}
               onChange={(e) => setSkills(e.target.value)}
+              readOnly={modalType === "view"}
             />
           </div>
           <div className="inputField">
@@ -153,6 +159,7 @@ const AddTeamModal = ({
               type="text"
               value={PU}
               onChange={(e) => setPU(e.target.value)}
+              readOnly={modalType === "view"}
             />
           </div>
           <div className="inputField">
@@ -161,6 +168,7 @@ const AddTeamModal = ({
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
+              readOnly={modalType === "view"}
               //   min={new Date().toISOString().split("T")[0]}
             />
           </div>
@@ -170,6 +178,7 @@ const AddTeamModal = ({
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
+              readOnly={modalType === "view"}
               //   min={new Date().toISOString().split("T")[0]}
             />
           </div>
@@ -182,6 +191,7 @@ const AddTeamModal = ({
                 { value: "CAPEX", label: "CAPEX" },
                 { value: "OPEX", label: "OPEX" },
               ]}
+              readOnly={modalType === "view"}
             />
           </div>
           <div className="inputField">
@@ -195,6 +205,7 @@ const AddTeamModal = ({
                 { value: "Dev", label: "Dev" },
                 { value: "KTLO", label: "KTLO" },
               ]}
+              readOnly={modalType === "view"}
             />
           </div>
           <div className="inputField">
@@ -203,6 +214,7 @@ const AddTeamModal = ({
               type="text"
               value={productName}
               onChange={(e) => setProductName(e.target.value)}
+              readOnly={modalType === "view"}
             />
           </div>
           <div className="inputField">
@@ -211,6 +223,7 @@ const AddTeamModal = ({
               type="text"
               value={mission}
               onChange={(e) => setMission(e.target.value)}
+              readOnly={modalType === "view"}
             />
           </div>
           <div className="inputField">
@@ -219,6 +232,7 @@ const AddTeamModal = ({
               type="text"
               value={bpSponsorEmail}
               onChange={(e) => setBpSponsorEmail(e.target.value)}
+              readOnly={modalType === "view"}
             />
           </div>
           <div className="inputField">
@@ -227,6 +241,7 @@ const AddTeamModal = ({
               type="text"
               value={allocation}
               onChange={(e) => setAllocation(e.target.value)}
+              readOnly={modalType === "view"}
             />
           </div>
           <div className="inputField">
@@ -235,6 +250,7 @@ const AddTeamModal = ({
               type="text"
               value={contractType}
               onChange={(e) => setContractType(e.target.value)}
+              readOnly={modalType === "view"}
             />
           </div>
           <div className="inputField">
@@ -243,6 +259,7 @@ const AddTeamModal = ({
               type="text"
               value={rate}
               onChange={(e) => setRate(e.target.value)}
+              readOnly={modalType === "view"}
             />
           </div>
           <div className="inputField">
@@ -251,6 +268,7 @@ const AddTeamModal = ({
               type="text"
               value={backupResource}
               onChange={(e) => setBackupResource(e.target.value)}
+              readOnly={modalType === "view"}
             />
           </div>
         </div>
@@ -266,9 +284,11 @@ const AddTeamModal = ({
         <Button variant="secondary" onClick={() => handleCloseModal()}>
           Close
         </Button>
-        <Button variant="primary" onClick={() => onSaveChanges()}>
-          Save Changes
-        </Button>
+        {modalType !== "view" && (
+          <Button variant="primary" onClick={() => onSaveChanges()}>
+            Save Changes
+          </Button>
+        )}
       </Modal.Footer>
     </Modal>
   );

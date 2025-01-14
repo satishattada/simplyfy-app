@@ -21,9 +21,13 @@ function TeamViewComponent() {
   );
   const [teamData, setTeamData] = useAtom(teamDataAtom);
   const [showModal, setShowModal] = useState<boolean>(false);
+  const [modalType, setModalType] = useState<string>("add");
+  const [modalData, setModalData] = useState<object>({});
 
   const handleToggleModel = () => {
     setShowModal(!showModal);
+    setModalData({});
+    setModalType("add");
   };
   useEffect(() => {
     teamService
@@ -74,9 +78,21 @@ function TeamViewComponent() {
     setCurrentPage(pageNumber);
   };
   const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const handleEditModel = (request: any) => {
+    console.log(request,'---------edit------');
+    setShowModal(true);
+    setModalData(request);
+    setModalType("edit");
+  }
+
   return (
     <>
-      <AddTeamModal showModal={showModal} onClose={() => handleToggleModel()} />
+      <AddTeamModal
+        showModal={showModal}
+        onClose={() => handleToggleModel()}
+        modalType={modalType}
+        modalData={modalType === "edit" ? modalData : undefined}
+      />
       <div className="d-flex justify-content-between mt-5 mb-4">
         <SearchComponent onSearch={handleSearchChange} />
         <div>
@@ -123,6 +139,7 @@ function TeamViewComponent() {
                     variant="outline-secondary"
                     size="sm"
                     className="rounded-btn"
+                    onClick={() => handleEditModel(request)}
                   >
                     Edit
                   </Button>

@@ -44,7 +44,8 @@ function TeamViewComponent() {
   }, []);
   useEffect(() => {
     if (query === "" || query === undefined) {
-      setTotalItems(Math.ceil(teamData.length / itemsPerPage));
+      //setTotalItems(Math.ceil(teamData.length / itemsPerPage));
+     // 
       const startIndex = (currentPage - 1) * itemsPerPage;
       const currentItems = teamData.slice(startIndex, startIndex + itemsPerPage);
       setFilteredData(currentItems); // Show all data if the search query is empty
@@ -66,13 +67,14 @@ function TeamViewComponent() {
           item.bpSponsorEmail?.toLowerCase().includes(query?.toLowerCase()) ||
           item.mission?.toLowerCase().includes(query?.toLowerCase())
       );
-      setTotalItems(Math.ceil(filtered.length / itemsPerPage));
+     // setTotalItems(Math.ceil(filtered.length / itemsPerPage));
       const startIndex = (currentPage - 1) * itemsPerPage;
       const currentItems = filtered.slice(startIndex, startIndex + itemsPerPage);
       console.log("inside currentItems...........",currentItems);
       setFilteredData(currentItems);
     }
   }, [teamData, query, currentPage]);
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
   const handleSearchChange = (query: string) => {
     setQuery(query);
   };
@@ -161,7 +163,7 @@ function TeamViewComponent() {
         <Pagination.Prev
           onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
         />
-        {Array.from({ length: totalItems }, (_, i) => i + 1).map((page) => (
+        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
           <Pagination.Item
             key={page}
             active={page === currentPage}
@@ -171,7 +173,7 @@ function TeamViewComponent() {
           </Pagination.Item>
         ))}
         <Pagination.Next
-          onClick={() => handlePageChange(Math.min(currentPage + 1, totalItems))}
+          onClick={() => handlePageChange(Math.min(currentPage + 1, totalPages))}
         />
       </Pagination>
     </>

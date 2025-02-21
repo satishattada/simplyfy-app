@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./styles.css";
 import Table from "react-bootstrap/Table";
 import { Pagination } from 'react-bootstrap';
-import { Form, InputGroup, Button } from "react-bootstrap";
-import { FaSearch, FaTimes } from "react-icons/fa";
+import { Button } from "react-bootstrap";
 import SearchComponent from "../search/searchComponent";
 import AddTeamModal from "../addTeamModal/addTeamModal";
 import { withParamsAndNavigate } from "../../routes/with-params-navigate";
@@ -24,11 +23,6 @@ function TeamViewComponent() {
   const [modalType, setModalType] = useState<string>("add");
   const [modalData, setModalData] = useState<object>({});
 
-  const handleToggleModel = () => {
-    setShowModal(!showModal);
-    setModalData({});
-    setModalType("add");
-  };
   useEffect(() => {
     teamService
       .getTeamData()
@@ -82,29 +76,44 @@ function TeamViewComponent() {
     setCurrentPage(pageNumber);
   };
   
-  const handleEditModel = (request: any) => {
-    console.log(request,'---------edit------');
+  const handleCloseModel = () => {
+    setShowModal(false);
+    setModalData({});
+  };
+
+  const handleModal = (type: string, request?: any) => {
     setShowModal(true);
-    setModalData(request);
-    setModalType("edit");
-  }
+    setModalType(type);
+    switch (type) {
+      case "add":
+        setModalData({});
+        break;
+      case "edit":
+      case "view":
+        setModalData(request);
+        break;
+      default:
+        setModalData({});
+    }
+  };
+
 
   return (
     <>
       <AddTeamModal
         showModal={showModal}
-        onClose={() => handleToggleModel()}
+        onClose={() => handleCloseModel()}
         modalType={modalType}
-        modalData={modalType === "edit" ? modalData : undefined}
+        modalData={modalType === "edit" || modalType === "view"  ? modalData : undefined}
       />
       <div className="d-flex justify-content-between mt-5 mb-4">
         <SearchComponent onSearch={handleSearchChange} />
         <div>
         <i
           className="bi bi-plus-circle edit-btn"
-          onClick={() => handleToggleModel()}
+          onClick={() => handleModal("add",{})}
         ></i>
-         <CSVLink data={teamData}  filename="employee-details.csv" target="_blank">
+        <CSVLink data={teamData}  filename="employee-details.csv" target="_blank">
          <i className="bi bi-filetype-csv export-btn"></i>
         </CSVLink>
        
@@ -129,7 +138,12 @@ function TeamViewComponent() {
           {filteredData && filteredData?.length > 0 ? (
             filteredData?.map((request) => (
               <tr key={request.infyId}>
-                <td>{request.infyId}</td>
+                <td
+                  style={{ color: "blue", textDecoration: "underline", cursor: "pointer" }}
+                  onClick={() => handleModal("view", request)}
+                >
+                  {request.infyId}
+                </td>
                 <td>{request.infyEmail}</td>
                 <td>{request.location}</td>
                 <td>{request.skills}</td>
@@ -143,7 +157,7 @@ function TeamViewComponent() {
                     variant="outline-secondary"
                     size="sm"
                     className="rounded-btn"
-                    onClick={() => handleEditModel(request)}
+                    onClick={() => handleModal("edit",request)}
                   >
                     Edit
                   </Button>

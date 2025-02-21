@@ -1,7 +1,8 @@
 import React from 'react';
 import './styles.css';
 
-const InputField = ({ label, type, value, onChange, min, placeholder }) => {
+const InputField = ({ label, type, value, onChange, min, placeholder,readOnly}) => {
+  console.log(label,readOnly)
     return (
       <div className='inputFieldcontainer'>
         <label className='inputFieldLabelStyle'>
@@ -14,6 +15,7 @@ const InputField = ({ label, type, value, onChange, min, placeholder }) => {
           onChange={onChange}
           min={min}
           placeholder={placeholder}
+          disabled={readOnly}
         />
       </div>
     );

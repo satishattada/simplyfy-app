@@ -9,14 +9,14 @@ const DurationField = ({ label, duration, durationType, onChangeDuration, onChan
       </label>
       <div style={{ display: 'flex' }}>
         <input
-          style={{ width: '50%', height: '40px', padding: '10px', fontSize: '16px', borderRadius: '5px 0 0 5px', border: '1px solid #ccc' }}
+          style={{ width: '50%', height: '40px', padding: '10px', fontSize: '14px', borderRadius: '5px 0 0 5px', border: '1px solid #ccc' }}
           type="number"
           value={duration}
           onChange={onChangeDuration}
           min={1}
         />
         <select
-          style={{ width: '50%', height: '60px', padding: '10px', fontSize: '16px', borderRadius: '0 5px 5px 0', border: '1px solid #ccc' }}
+          style={{ width: '50%', height: '60px', padding: '10px', fontSize: '14px', borderRadius: '0 5px 5px 0', border: '1px solid #ccc' }}
           value={durationType}
           onChange={onChangeDurationType}
         >

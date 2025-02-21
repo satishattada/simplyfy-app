@@ -1,107 +1,202 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Button } from "react-bootstrap";
 import InputField from "../inputField/inputField";
-import SelectField from "../selectField/selectField";
 import "./styles.css";
 import { useAtom } from "jotai";
 import { teamDataAtom } from "../../atoms/teamAtoms";
 
 const AddTeamModal = ({ showModal, onClose, modalType, modalData = {} }) => {
-  const [infyId, setInfyId] = useState("");
-  const [infyEmail, setInfyEmail] = useState("");
-  const [location, setLocation] = useState("");
-  const [skills, setSkills] = useState("");
-  const [PU, setPU] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [bpSponsorEmail, setBpSponsorEmail] = useState("");
-  const [mission, setMission] = useState("");
-  const [productName, setProductName] = useState("");
-  const [workType, setWorkType] = useState("");
-  const [workScope, setWorkScope] = useState("");
-  const [allocation, setAllocation] = useState("");
-  const [contractType, setContractType] = useState("");
-  const [rate, setRate] = useState("");
-  const [backupResource, setBackupResource] = useState("");
+  const [formData, setFormData] = useState({
+    employeeNumber: "",
+    resourceName: "",
+    mission: "",
+    project: "",
+    l3Activity: "",
+    location: "",
+    pu: "",
+    allocation: "",
+    contractType: "",
+    infosysRole: "",
+    empBandCode: "",
+    empType: "",
+    projectCode: "",
+    masterProjectCode: "",
+    missionPMName: "",
+    billableType: "",
+    billabilityRemarks: "",
+    primarySkill: "",
+    secondarySkill: "",
+    ntid: "",
+    gpid: "",
+    bpEmailId: "",
+    empDU: "",
+    empSubUnit: "",
+    empUnit: "",
+    empCompany: "",
+    stpSEZ: "",
+    baseCity: "",
+    baseLocation: "",
+    projectDMMailID: "",
+    projectType: "",
+    projectName: "",
+    projectFromDate: "",
+    projectToDate: "",
+    serviceCode: "",
+    projectBU: "",
+    projectPU: "",
+    projectSubUnit: "",
+    projectUnit: "",
+    projectCompany: "",
+    allocFromDate: "",
+    allocToDate: "",
+    percent: "",
+    onsiteOffshore: "",
+    allocatedCountry: "",
+    allocatedCity: "",
+    reportingTo: "",
+    isResourceLocatedAtBP: "",
+    bpOfficeLocation: "",
+  });
+
   const [teamData, setTeamData] = useAtom(teamDataAtom);
 
   useEffect(() => {
-    console.log("modalData............edit/view", modalType, modalData);
     if (modalType === "edit" || modalType === "view") {
-      setInfyId(modalData.infyId);
-      setInfyEmail(modalData.infyEmail);
-      setLocation(modalData.location);
-      setSkills(modalData.skills);
-      setPU(modalData.PU);
-      setStartDate(modalData.startDate);
-      setEndDate(modalData.endDate);
-      setBpSponsorEmail(modalData.bpSponsorEmail);
-      setMission(modalData.mission);
-      setProductName(modalData.productName);
-      setWorkType(modalData.workType);
-      setWorkScope(modalData.workScope);
-      setAllocation(modalData.allocation);
-      setContractType(modalData.contractType);
-      setRate(modalData.rate);
-      setBackupResource(modalData.backupResource);
+      setFormData(modalData);
     }
   }, [modalType, modalData]);
 
+  const handleChange = (e,name) => {
+    const value = e.target.value;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
   const onSaveChanges = () => {
-    const newData = {
-      infyId: infyId,
-      infyEmail: infyEmail,
-      location: location,
-      skills,
-      PU: PU,
-      startDate,
-      endDate,
-      bpSponsorEmail: bpSponsorEmail,
-      mission,
-      productName,
-      workType,
-      workScope,
-      allocation,
-      contractType,
-      rate,
-      backupResource,
-    };
-    console.log("teamData............", teamData, newData);
     if (modalType === "edit") {
       const updatedTeamData = teamData.map((item) =>
-        item.infyId === infyId ? newData : item
+        item.employeeNumber === formData.employeeNumber ? formData : item
       );
       setTeamData(updatedTeamData);
     } else {
-      setTeamData([...teamData, newData]);
+      setTeamData([...teamData, formData]);
     }
     handleCloseModal();
   };
 
   const handleCloseModal = () => {
-    setInfyId("");
-    setInfyEmail("");
-    setLocation("");
-    setSkills("");
-    setPU("");
-    setStartDate("");
-    setEndDate("");
-    setBpSponsorEmail("");
-    setMission("");
-    setProductName("");
-    setWorkType("");
-    setWorkScope("");
-    setAllocation("");
-    setContractType("");
-    setRate("");
-    setBackupResource("");
+    setFormData({
+      employeeNumber: "",
+      resourceName: "",
+      mission: "",
+      project: "",
+      l3Activity: "",
+      location: "",
+      pu: "",
+      allocation: "",
+      contractType: "",
+      infosysRole: "",
+      empBandCode: "",
+      empType: "",
+      projectCode: "",
+      masterProjectCode: "",
+      missionPMName: "",
+      billableType: "",
+      billabilityRemarks: "",
+      primarySkill: "",
+      secondarySkill: "",
+      ntid: "",
+      gpid: "",
+      bpEmailId: "",
+      empDU: "",
+      empSubUnit: "",
+      empUnit: "",
+      empCompany: "",
+      stpSEZ: "",
+      baseCity: "",
+      baseLocation: "",
+      projectDMMailID: "",
+      projectType: "",
+      projectName: "",
+      projectFromDate: "",
+      projectToDate: "",
+      serviceCode: "",
+      projectBU: "",
+      projectPU: "",
+      projectSubUnit: "",
+      projectUnit: "",
+      projectCompany: "",
+      allocFromDate: "",
+      allocToDate: "",
+      percent: "",
+      onsiteOffshore: "",
+      allocatedCountry: "",
+      allocatedCity: "",
+      reportingTo: "",
+      isResourceLocatedAtBP: "",
+      bpOfficeLocation: "",
+    });
     onClose();
   };
+
+  const inputFields = [
+    { label: "Employee Number", name: "employeeNumber" },
+    { label: "Resource Name", name: "resourceName" },
+    { label: "Mission", name: "mission" },
+    { label: "Project", name: "project" },
+    { label: "L3 Activity", name: "l3Activity" },
+    { label: "Location", name: "location" },
+    { label: "PU", name: "pu" },
+    { label: "Allocation", name: "allocation" },
+    { label: "Contract Type", name: "contractType" },
+    { label: "Infosys Role", name: "infosysRole" },
+    { label: "Emp Band Code", name: "empBandCode" },
+    { label: "Emp Type", name: "empType" },
+    { label: "Project Code", name: "projectCode" },
+    { label: "Master Project Code", name: "masterProjectCode" },
+    { label: "Mission PM Name", name: "missionPMName" },
+    { label: "Billable Type", name: "billableType" },
+    { label: "Billability Remarks", name: "billabilityRemarks" },
+    { label: "Primary Skill", name: "primarySkill" },
+    { label: "Secondary Skill", name: "secondarySkill" },
+    { label: "NT ID", name: "ntid" },
+    { label: "GP ID", name: "gpid" },
+    { label: "BP Email ID", name: "bpEmailId" },
+    { label: "Emp DU", name: "empDU" },
+    { label: "Emp Sub Unit", name: "empSubUnit" },
+    { label: "Emp Unit", name: "empUnit" },
+    { label: "Emp Company", name: "empCompany" },
+    { label: "STP/SEZ", name: "stpSEZ" },
+    { label: "Base City", name: "baseCity" },
+    { label: "Base Location", name: "baseLocation" },
+    { label: "Project DM Mail ID", name: "projectDMMailID" },
+    { label: "Project Type", name: "projectType" },
+    { label: "Project Name", name: "projectName" },
+    { label: "Project From Date", name: "projectFromDate" },
+    { label: "Project To Date", name: "projectToDate" },
+    { label: "Service Code", name: "serviceCode" },
+    { label: "Project BU", name: "projectBU" },
+    { label: "Project PU", name: "projectPU" },
+    { label: "Project Sub Unit", name: "projectSubUnit" },
+    { label: "Project Unit", name: "projectUnit" },
+    { label: "Project Company", name: "projectCompany" },
+    { label: "Alloc From Date", name: "allocFromDate" },
+    { label: "Alloc To Date", name: "allocToDate" },
+    { label: "Percent", name: "percent" },
+    { label: "Onsite/Offshore", name: "onsiteOffshore" },
+    { label: "Allocated Country", name: "allocatedCountry" },
+    { label: "Allocated City", name: "allocatedCity" },
+    { label: "Reporting To", name: "reportingTo" },
+    { label: "Is Resource Located at BP", name: "isResourceLocatedAtBP" },
+    { label: "BP Office Location", name: "bpOfficeLocation" },
+  ];
 
   return (
     <Modal
       show={showModal}
-      onHide={() => handleCloseModal()}
+      onHide={handleCloseModal}
       fullscreen={true}
       aria-labelledby="contained-modal-title-vcenter"
       centered
@@ -117,160 +212,21 @@ const AddTeamModal = ({ showModal, onClose, modalType, modalData = {} }) => {
       </Modal.Header>
       <Modal.Body>
         <div className="modalContent">
-          <div className="inputField">
-            <InputField
-              label="Infosys Id"
-              type="text"
-              value={infyId}
-              onChange={(e) => setInfyId(e.target.value)}
-              readOnly={modalType === "view" || modalType === "edit"}
-            />
-          </div>
-          <div className="inputField">
-            <InputField
-              label="Infosys Email"
-              type="text"
-              value={infyEmail}
-              onChange={(e) => setInfyEmail(e.target.value)}
-              readOnly={modalType === "view" ||modalType ===  "edit"}
-            />
-          </div>
-          <div className="inputField">
-            <InputField
-              label="Location"
-              type="text"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              readOnly={modalType === "view"}
-            />
-          </div>
-          <div className="inputField">
-            <InputField
-              label="Skills"
-              type="text"
-              value={skills}
-              onChange={(e) => setSkills(e.target.value)}
-              readOnly={modalType === "view"}
-            />
-          </div>
-          <div className="inputField">
-            <InputField
-              label="PU"
-              type="text"
-              value={PU}
-              onChange={(e) => setPU(e.target.value)}
-              readOnly={modalType === "view"}
-            />
-          </div>
-          <div className="inputField">
-            <InputField
-              label="Start Date"
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              readOnly={modalType === "view"}
-              //   min={new Date().toISOString().split("T")[0]}
-            />
-          </div>
-          <div className="inputField">
-            <InputField
-              label="End Date"
-              type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              readOnly={modalType === "view"}
-              //   min={new Date().toISOString().split("T")[0]}
-            />
-          </div>
-          <div className="inputField">
-            <SelectField
-              label="Work Type"
-              value={workType}
-              onChange={(e) => setWorkType(e.target.value)}
-              options={[
-                { value: "CAPEX", label: "CAPEX" },
-                { value: "OPEX", label: "OPEX" },
-              ]}
-              readOnly={modalType === "view"}
-            />
-          </div>
-          <div className="inputField">
-            <SelectField
-              label="Work Scope"
-              value={workScope}
-              onChange={(e) => setWorkScope(e.target.value)}
-              options={[
-                { value: "DevOps", label: "DevOps" },
-                { value: "OpsDev", label: "OpsDev" },
-                { value: "Dev", label: "Dev" },
-                { value: "KTLO", label: "KTLO" },
-              ]}
-              readOnly={modalType === "view"}
-            />
-          </div>
-          <div className="inputField">
-            <InputField
-              label="Product/App Name"
-              type="text"
-              value={productName}
-              onChange={(e) => setProductName(e.target.value)}
-              readOnly={modalType === "view"}
-            />
-          </div>
-          <div className="inputField">
-            <InputField
-              label="Mission"
-              type="text"
-              value={mission}
-              onChange={(e) => setMission(e.target.value)}
-              readOnly={modalType === "view"}
-            />
-          </div>
-          <div className="inputField">
-            <InputField
-              label="bp Sponsor Email"
-              type="text"
-              value={bpSponsorEmail}
-              onChange={(e) => setBpSponsorEmail(e.target.value)}
-              readOnly={modalType === "view"}
-            />
-          </div>
-          <div className="inputField">
-            <InputField
-              label="Allocation %"
-              type="text"
-              value={allocation}
-              onChange={(e) => setAllocation(e.target.value)}
-              readOnly={modalType === "view"}
-            />
-          </div>
-          <div className="inputField">
-            <InputField
-              label="Contract Type"
-              type="text"
-              value={contractType}
-              onChange={(e) => setContractType(e.target.value)}
-              readOnly={modalType === "view"}
-            />
-          </div>
-          <div className="inputField">
-            <InputField
-              label="Rate"
-              type="text"
-              value={rate}
-              onChange={(e) => setRate(e.target.value)}
-              readOnly={modalType === "view"}
-            />
-          </div>
-          <div className="inputField">
-            <InputField
-              label="Backup Resource"
-              type="text"
-              value={backupResource}
-              onChange={(e) => setBackupResource(e.target.value)}
-              readOnly={modalType === "view"}
-            />
-          </div>
+          {inputFields.map((field) => (
+            <div className="inputField" key={field.name}>
+              <InputField
+                label={field.label}
+                type="text"
+                name={field.name}
+                value={formData[field.name]}
+                onChange={(e) => handleChange(e, field.name)}
+                readOnly={
+                  modalType === "view" ||
+                  (modalType === "edit" && field.name === "employeeNumber")
+                }
+              />
+            </div>
+          ))}
         </div>
       </Modal.Body>
       <Modal.Footer
@@ -281,11 +237,11 @@ const AddTeamModal = ({ showModal, onClose, modalType, modalData = {} }) => {
           padding: "20px",
         }}
       >
-        <Button variant="secondary" onClick={() => handleCloseModal()}>
+        <Button variant="secondary" onClick={handleCloseModal}>
           Close
         </Button>
         {modalType !== "view" && (
-          <Button variant="primary" onClick={() => onSaveChanges()}>
+          <Button variant="primary" onClick={onSaveChanges}>
             Save Changes
           </Button>
         )}

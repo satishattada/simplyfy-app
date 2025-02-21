@@ -10,6 +10,7 @@ import teamService from "../../services/teamService";
 import { teamDataAtom, TeamReq } from "../../atoms/teamAtoms";
 import { useAtom } from "jotai";
 import { CSVLink } from 'react-csv';
+import * as XLSX from 'xlsx';
 function TeamViewComponent() {
   const itemsPerPage = 5;
   const [currentPage, setCurrentPage] = useState(1);
@@ -47,19 +48,21 @@ function TeamViewComponent() {
       // Filter data based on the query
       const filtered = teamData && teamData?.filter(
         (item: any) =>
-          item.infyId.includes(query) ||
-          item.infyEmail?.toLowerCase().includes(query?.toLowerCase()) ||
-          item.location?.toLowerCase().includes(query?.toLowerCase()) ||
-          item.skills
+          item.employeeNumber.includes(query) ||
+          item.resourceName?.toLowerCase().includes(query?.toLowerCase()) ||
+          item.mission?.toLowerCase().includes(query?.toLowerCase()) ||
+          item.primarySkill
             ?.split(",")
             .some((skill: string) =>
               skill.trim().toLowerCase().includes(query?.toLowerCase())
             ) ||
-          item.PU?.toLowerCase().includes(query?.toLowerCase()) ||
-          item.startDate?.toLowerCase().includes(query?.toLowerCase()) ||
-          item.endDate?.toLowerCase().includes(query?.toLowerCase()) ||
-          item.bpSponsorEmail?.toLowerCase().includes(query?.toLowerCase()) ||
-          item.mission?.toLowerCase().includes(query?.toLowerCase())
+          item.project?.toLowerCase().includes(query?.toLowerCase()) ||
+          item.l3Activity?.toLowerCase().includes(query?.toLowerCase()) ||
+          item.location?.toLowerCase().includes(query?.toLowerCase()) ||
+          item.pu?.toLowerCase().includes(query?.toLowerCase()) ||
+          item.allocation?.toLowerCase().includes(query?.toLowerCase()) ||
+          item.contractType?.toLowerCase().includes(query?.toLowerCase()) ||
+          item.infosysRole?.toLowerCase().includes(query?.toLowerCase())
       );
      // setTotalItems(Math.ceil(filtered.length / itemsPerPage));
       const startIndex = (currentPage - 1) * itemsPerPage;
@@ -96,6 +99,25 @@ function TeamViewComponent() {
         setModalData({});
     }
   };
+  const handleBulkUpload = (event:any) => {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      if (e.target && e.target.result) {
+        const data = new Uint8Array(e.target.result as ArrayBuffer);
+        const workbook = XLSX.read(data, { type: "array" });
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+        console.log(jsonData);
+        const newData = jsonData.filter((newItem: any) => 
+          !teamData.some((existingItem) => existingItem.employeeNumber === newItem.employeeNumber)
+        );
+        setTeamData((prevData) => [...prevData, ...(newData as TeamReq[])]);
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  };
 
 
   return (
@@ -108,50 +130,61 @@ function TeamViewComponent() {
       />
       <div className="d-flex justify-content-between mt-5 mb-4">
         <SearchComponent onSearch={handleSearchChange} />
-        <div>
-        <i
-          className="bi bi-plus-circle edit-btn"
-          onClick={() => handleModal("add",{})}
-        ></i>
-        <CSVLink data={teamData}  filename="employee-details.csv" target="_blank">
-         <i className="bi bi-filetype-csv export-btn"></i>
-        </CSVLink>
-       
-       </div>
+        <div className="d-flex align-items-center">
+          <i
+            className="bi bi-plus-circle edit-btn mx-2"
+            onClick={() => handleModal("add",{})}
+          ></i>
+          <CSVLink data={teamData} filename="employee-details.csv" target="_blank">
+            <i className="bi bi-filetype-csv export-btn mx-2"></i>
+          </CSVLink>
+          <input
+            type="file"
+            accept=".xlsx, .xls"
+            onChange={handleBulkUpload}
+            style={{ display: "none" }}
+            id="bulkUpload"
+          />
+          <label htmlFor="bulkUpload" className="mx-2">
+            <i className="bi bi-upload edit-btn"></i>
+          </label>
+        </div>
       </div>
       <Table>
         <thead>
           <tr>
-            <td>Infosys ID</td>
-            <td>Infosys Email</td>
+            <td>Employee Number</td>
+            <td>Resource Name</td>
             <td>Location</td>
-            <td>Skills</td>
-            <td>PU</td>
-            <td>Start Date</td>
-            <td>End Date</td>
-            <td>BP Sponsor Email</td>
             <td>Mission</td>
+            <td>Project</td>
+            <td>L3 Activity</td>
+            <td>Location</td>
+            <td>PU</td>
+            <td>Allocation</td>
+            <td>Infosys Role</td>
             <td>Action</td>
           </tr>
         </thead>
         <tbody>
           {filteredData && filteredData?.length > 0 ? (
             filteredData?.map((request) => (
-              <tr key={request.infyId}>
+              <tr key={request.employeeNumber}>
                 <td
                   style={{ color: "blue", textDecoration: "underline", cursor: "pointer" }}
                   onClick={() => handleModal("view", request)}
                 >
-                  {request.infyId}
+                  {request.employeeNumber}
                 </td>
-                <td>{request.infyEmail}</td>
+                <td>{request.resourceName}</td>
                 <td>{request.location}</td>
-                <td>{request.skills}</td>
-                <td>{request.PU}</td>
-                <td>{request.startDate}</td>
-                <td>{request.endDate}</td>
-                <td>{request.bpSponsorEmail}</td>
                 <td>{request.mission}</td>
+                <td>{request.project}</td>
+                <td>{request.l3Activity}</td>
+                <td>{request.location}</td>
+                <td>{request.pu}</td>
+                <td>{request.allocation}</td>
+                <td>{request.infosysRole}</td>
                 <td>
                   <Button
                     variant="outline-secondary"

@@ -66,7 +66,7 @@ const AddTeamModal = ({ showModal, onClose, modalType, modalData = {} }) => {
     }
   }, [modalType, modalData]);
 
-  const handleChange = (e,name) => {
+  const handleChange = (e, name) => {
     const value = e.target.value;
     setFormData((prevData) => ({
       ...prevData,
@@ -141,18 +141,7 @@ const AddTeamModal = ({ showModal, onClose, modalType, modalData = {} }) => {
     onClose();
   };
 
-  const inputFields = [
-    { label: "Employee Number", name: "employeeNumber" },
-    { label: "Resource Name", name: "resourceName" },
-    { label: "Mission", name: "mission" },
-    { label: "Project", name: "project" },
-    { label: "L3 Activity", name: "l3Activity" },
-    { label: "Location", name: "location" },
-    { label: "PU", name: "pu" },
-    { label: "Allocation", name: "allocation" },
-    { label: "Contract Type", name: "contractType" },
-    { label: "Infosys Role", name: "infosysRole" },
-    { label: "Emp Band Code", name: "empBandCode" },
+  const financeInputFields = [
     { label: "Emp Type", name: "empType" },
     { label: "Project Code", name: "projectCode" },
     { label: "Master Project Code", name: "masterProjectCode" },
@@ -168,6 +157,22 @@ const AddTeamModal = ({ showModal, onClose, modalType, modalData = {} }) => {
     { label: "Emp Sub Unit", name: "empSubUnit" },
     { label: "Emp Unit", name: "empUnit" },
     { label: "Emp Company", name: "empCompany" },
+  ];
+  const personalInputFields = [
+    { label: "Employee Number", name: "employeeNumber" },
+    { label: "Resource Name", name: "resourceName" },
+    { label: "Mission", name: "mission" },
+    { label: "Project", name: "project" },
+    { label: "L3 Activity", name: "l3Activity" },
+    { label: "Location", name: "location" },
+    { label: "PU", name: "pu" },
+    { label: "Allocation", name: "allocation" },
+    { label: "Contract Type", name: "contractType" },
+    { label: "Infosys Role", name: "infosysRole" },
+    { label: "Emp Band Code", name: "empBandCode" },
+  ];
+
+  const otherInputFields = [
     { label: "STP/SEZ", name: "stpSEZ" },
     { label: "Base City", name: "baseCity" },
     { label: "Base Location", name: "baseLocation" },
@@ -212,21 +217,143 @@ const AddTeamModal = ({ showModal, onClose, modalType, modalData = {} }) => {
       </Modal.Header>
       <Modal.Body>
         <div className="modalContent">
-          {inputFields.map((field) => (
-            <div className="inputField" key={field.name}>
-              <InputField
-                label={field.label}
-                type="text"
-                name={field.name}
-                value={formData[field.name]}
-                onChange={(e) => handleChange(e, field.name)}
-                readOnly={
-                  modalType === "view" ||
-                  (modalType === "edit" && field.name === "employeeNumber")
-                }
-              />
+          <div className="container mt-5">
+            {/* {personalInputFields.map((field) => (
+              <div className="inputField" key={field.name}>
+                <InputField
+                  label={field.label}
+                  type="text"
+                  name={field.name}
+                  value={formData[field.name]}
+                  onChange={(e) => handleChange(e, field.name)}
+                  readOnly={
+                    modalType === "view" ||
+                    (modalType === "edit" && field.name === "employeeNumber")
+                  }
+                />
+              </div>
+            ))} */}
+
+            <div className="accordion" id="accordionExample">
+              <div className="accordion-item">
+                <h2 className="accordion-header" id="headingOne">
+                  <button
+                    className="accordion-button"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#collapseOne"
+                    aria-expanded="true"
+                    aria-controls="collapseOne"
+                  >
+                   <b>Personal Information</b>
+                  </button>
+                </h2>
+                <div
+                  id="collapseOne"
+                  className="accordion-collapse collapse show"
+                  aria-labelledby="headingOne"
+                  data-bs-parent="#accordionExample"
+                >
+                  <div className="accordion-body">
+                    {personalInputFields.map((field) => (
+                      <div className="inputField" key={field.name}>
+                        <InputField
+                          label={field.label}
+                          type="text"
+                          name={field.name}
+                          value={formData[field.name]}
+                          onChange={(e) => handleChange(e, field.name)}
+                          readOnly={
+                            modalType === "view" ||
+                            (modalType === "edit" &&
+                              field.name === "employeeNumber")
+                          }
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <div className="accordion-item">
+                <h2 className="accordion-header" id="headingTwo">
+                  <button
+                    className="accordion-button collapsed"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#collapseTwo"
+                    aria-expanded="false"
+                    aria-controls="collapseTwo"
+                  >
+                    <b>Financial Information</b>
+                  </button>
+                </h2>
+                <div
+                  id="collapseTwo"
+                  className="accordion-collapse collapse"
+                  aria-labelledby="headingTwo"
+                  data-bs-parent="#accordionExample"
+                >
+                  <div className="accordion-body">
+                    {financeInputFields.map((field) => (
+                      <div className="inputField" key={field.name}>
+                        <InputField
+                          label={field.label}
+                          type="text"
+                          name={field.name}
+                          value={formData[field.name]}
+                          onChange={(e) => handleChange(e, field.name)}
+                          readOnly={
+                            modalType === "view" ||
+                            (modalType === "edit" &&
+                              field.name === "employeeNumber")
+                          }
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <div className="accordion-item">
+                <h2 className="accordion-header" id="headingThree">
+                  <button
+                    className="accordion-button collapsed"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#collapseThree"
+                    aria-expanded="false"
+                    aria-controls="collapseThree"
+                  >
+                    <b>Other Information</b>
+                  </button>
+                </h2>
+                <div
+                  id="collapseThree"
+                  className="accordion-collapse collapse"
+                  aria-labelledby="headingThree"
+                  data-bs-parent="#accordionExample"
+                >
+                  <div className="accordion-body">
+                    {otherInputFields.map((field) => (
+                      <div className="inputField" key={field.name}>
+                        <InputField
+                          label={field.label}
+                          type="text"
+                          name={field.name}
+                          value={formData[field.name]}
+                          onChange={(e) => handleChange(e, field.name)}
+                          readOnly={
+                            modalType === "view" ||
+                            (modalType === "edit" &&
+                              field.name === "employeeNumber")
+                          }
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
             </div>
-          ))}
+          </div>
         </div>
       </Modal.Body>
       <Modal.Footer

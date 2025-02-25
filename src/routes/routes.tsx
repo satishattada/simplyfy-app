@@ -4,10 +4,10 @@ import Layout from "../pages/layout/layout";
 import Dashboard from "../pages/layout/dashboard/dashboard";
 import NoPage from "../pages/noPage/noPage";
 import Login from "../pages/login/login";
-import DemandManagement from "../pages/layout/demandManagement/demandManagement";
+import ContractsManagement from "../pages/layout/contractsManagement/contractsManagement";
 import TeamManagement from "../pages/layout/teamManagement/teamManagement";
 import FinanceManagement from "../pages/layout/financeManagement/financeManagement";
-import DemandView from "../components/demandView/demandView";
+import DemandView from "../components/contractsView/contractsView";
 
 
 function RoutesContainer() {
@@ -16,7 +16,7 @@ function RoutesContainer() {
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route path="/" element={<Dashboard />} />
-          <Route path="/demand-management" element={<DemandManagement />} />
+          <Route path="/contracts-management" element={<ContractsManagement />} />
           <Route path="/employee-management" element={<TeamManagement />} />
           <Route path="/finance-management" element={<FinanceManagement />} />
         </Route>

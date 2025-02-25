@@ -12,7 +12,7 @@ import finance from '../../../assets/icons/finance.jpg'
 function Dashboard() {
   const navigate = useNavigate();
   const cards = [
-    { id: 1, path: "demand-management", description: "Demand Management", image: `${demand}` },
+    { id: 1, path: "contracts-management", description: "Contracts Management", image: `${demand}` },
     { id: 2, path: "employee-management", description: "Employee Management", image: `${team}` },
     { id: 3, path: "finance-management", description: "Finance Management", image: `${finance}` },
   ];

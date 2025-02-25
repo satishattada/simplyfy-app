@@ -1,0 +1,28 @@
+td .rounded-btn {
+    border-radius: 50px;
+    /* Custom border-radius */
+    padding: 4px 15px;
+    /* Adjust button padding if necessary */
+  }
+  thead td{
+    font-weight: 600;
+  }
+  ul.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .pagination li {
+    color: black;
+    float: left;
+    padding: 8px 16px;
+    text-decoration: none;
+  }
+  .pagination .page-link{
+    border: none;
+  }
+  .pagination .active>.page-link, .page-link.active{
+    background-color: #009900;
+    border-radius: 50%;
+  }

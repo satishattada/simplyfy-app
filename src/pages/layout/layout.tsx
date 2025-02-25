@@ -26,8 +26,8 @@ const Layout = (props: any) => {
         return 'Finance Management';
       case RoutesEnum.DASHBOARD:
         return 'Dashboard';
-      case RoutesEnum.DEMAND_MANAGEMENT:
-         return 'Demand Management'  
+      case RoutesEnum.CONTRACTS_MANAGEMENT:
+         return 'Contracts Management'  
       default:
         return 'Dashboard';
     }

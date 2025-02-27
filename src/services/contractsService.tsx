@@ -1,3 +1,4 @@
+
 interface contractReq {
   id: number;
   bpSubPortfolio: string;
@@ -5,10 +6,7 @@ interface contractReq {
   contractType: string;
   discountPercentage: number;
   teamType: string;
-  ReferencePO: number;
   PORevision: string;
-  Year: number;
-  subPortfolio: string;
   contractProgram: string;
   contractCSG: string;
   revenueType: string;
@@ -26,10 +24,11 @@ interface contractReq {
   linkedDPSNumber: number;
   infosysContractType: string;
   totalSoWWorkers: number;
+  years: any;
 }
 
 const contractData = [
-  {
+  { 
     id: 1,
     bpSubPortfolio: "Pulse (CandP1 (Pulse)",
     contractName: "BP",
@@ -38,25 +37,53 @@ const contractData = [
     teamType: "DevOps",
     contractCurrency: "USD",
     contractFGID: "12345",
-    ReferencePO: "",
     PORevision: "Original",
-    subPortfolio: "M&C (CandP2 (B2C))",
     contractProgram: "Consumer",
-    contractCSG: "",
+    contractCSG: "test",
     revenueType: "Capex",
     contractStartDate: "2024-01-01",
     contractEndDate: "2026-12-31",
-    referencePO: "",
-    POAmountOMS: "",
-    POAmountFG: "",
-    POAmountAriba: "",
-    masterProjectCode: "",
-    masterProjectCodePM: "",
+    referencePO: "test",
+    POAmountOMS: "test",
+    POAmountFG: "test",
+    POAmountAriba: "test",
+    masterProjectCode: "test",
+    masterProjectCodePM: "test",
     masterPU: 324,
     LOENumber: 34324,
     linkedDPSNumber: 5435,
     infosysContractType: "FP",
     totalSoWWorkers: 4,
+    years: {
+      2024: {
+        jan: "100",
+        feb: "270",
+        mar: "390",
+        apr: "470",
+        may: "50",
+        jun: "12",
+        jul: "46",
+        aug: "88",
+        sep: "86",
+        oct: "86",
+        nov: "",
+        dec: "",
+      },
+      2025: {
+        jan: "10",
+        feb: "20",
+        mar: "30",
+        apr: "40",
+        may: "50",
+        jun: "",
+        jul: "",
+        aug: "",
+        sep: "",
+        oct: "",
+        nov: "",
+        dec: "",
+      },
+    },
   },
   {
     id: 2,
@@ -67,7 +94,7 @@ const contractData = [
     teamType: "DEV",
     contractCurrency: "GBP",
     contractFGID: "12345",
-    ReferencePO: "",
+    ReferencePO: "test",
     PORevision: "Original",
     subPortfolio: "M&C (CandP2 (B2C))",
     contractProgram: "Consumer",
@@ -75,17 +102,33 @@ const contractData = [
     revenueType: "Capex",
     contractStartDate: "2024-01-01",
     contractEndDate: "2026-12-31",
-    referencePO: "",
-    POAmountOMS: "",
-    POAmountFG: "",
-    POAmountAriba: "",
-    masterProjectCode: "",
-    masterProjectCodePM: "",
+    referencePO: "test",
+    POAmountOMS: "test",
+    POAmountFG: "test",
+    POAmountAriba: "test",
+    masterProjectCode: "test",
+    masterProjectCodePM: "test",
     masterPU: 324,
     LOENumber: 34324,
     linkedDPSNumber: 5435,
     infosysContractType: "FP",
     totalSoWWorkers: 4,
+    years: {
+      2025: {
+        jan: "",
+        feb: "",
+        mar: "",
+        apr: "",
+        may: "",
+        jun: "",
+        jul: "",
+        aug: "",
+        sep: "",
+        oct: "",
+        nov: "",
+        dec: "",
+      },
+    },
   },
 ];
 

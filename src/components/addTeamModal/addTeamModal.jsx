@@ -245,7 +245,7 @@ const AddTeamModal = ({ showModal, onClose, modalType, modalData = {} }) => {
                     aria-expanded="true"
                     aria-controls="collapseOne"
                   >
-                   <b>Personal Information</b>
+                    <b>Personal Information</b>
                   </button>
                 </h2>
                 <div
@@ -368,7 +368,13 @@ const AddTeamModal = ({ showModal, onClose, modalType, modalData = {} }) => {
           Close
         </Button>
         {modalType !== "view" && (
-          <Button variant="primary" onClick={onSaveChanges}>
+          <Button
+            style={{
+              backgroundColor: "green",
+            }}
+            variant="primary"
+            onClick={onSaveChanges}
+          >
             Save Changes
           </Button>
         )}

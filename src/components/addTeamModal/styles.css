@@ -9,17 +9,18 @@
   }
   .accordion-body{
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
+    grid-template-columns: repeat(4, 1fr);
+    /* gap: 1rem; */
     margin-left: 3%;
   }
   .modal-body{
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    /* box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); */
     padding-top: 1px;
     margin: 0 10px;
   }
   .accordion-header .accordion-button:not(.collapsed) {
     background-color: #009900;
+    color:white
 }
 .accordion-button.collapsed {
     background-color: lightgray;

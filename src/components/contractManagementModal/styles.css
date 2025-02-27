@@ -1,0 +1,79 @@
+.inputField{
+    margin-bottom: 20px; 
+    padding: 10px;   
+}
+.modalContent{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .accordion-body{
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    /* gap: 1rem; */
+    margin-left: 3%;
+  }
+  .modal-body{
+    /* box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); */
+    padding-top: 1px;
+    margin: 0 10px;
+  }
+  .accordion-header .accordion-button:not(.collapsed) {
+    background-color: #009900;
+    color:white
+}
+.accordion-button.collapsed {
+    background-color: lightgray;
+}
+.accordion-body-milestone{
+  display: flex;
+flex-direction: row;
+}
+
+/* styles.css */
+.milestone-section {
+  margin-bottom: 20px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+
+.milestone-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.milestone-header h5 {
+  margin: 0;
+}
+
+.milestone-header button {
+  background-color: red;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.milestone-header button:hover {
+  background-color: darkred;
+}
+
+.milestone-months {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+}
+
+.milestone-month {
+  flex: 1 1 16%;
+  margin: 5px;
+}
+
+.add-year-button {
+  display: block;
+  margin-bottom: 20px;
+}

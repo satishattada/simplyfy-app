@@ -184,7 +184,7 @@ const ContractManagementModal = ({
   const onSaveChanges = () => {
     if (modalType === "edit") {
       const updatedTeamData = contractData.map((item) =>
-        item.employeeNumber === formData.employeeNumber ? formData : item
+        item.id === formData.id ? formData : item
       );
       setContractData(updatedTeamData);
     } else {
@@ -245,7 +245,7 @@ const ContractManagementModal = ({
     },
     { label: "Contract FGID", name: "contractFGID", fieldType: "text" },
     { label: "Reference PO", name: "referencePO", fieldType: "text" },
-    { label: "PO Revision", name: "PORevision", fieldType: "text" },
+    { label: "PO Revision", name: "PORevision", fieldType: "dropdown" },
   ];
 
   const contractsTrackerFields = [
@@ -488,17 +488,9 @@ const ContractManagementModal = ({
                               label={field.label}
                               value={formData[field.name]}
                               onChange={(e) =>
-                                setFormData({
-                                  ...modalData,
-                                  years: e.target.value,
-                                })
+                                handleChange(e, field.name)
                               }
-                              options={[
-                                {
-                                  value: formData[field.name],
-                                  label: formData[field.name],
-                                },
-                              ]}
+                              options={selectOptions[field.name] || []}
                             />
                           </div>
                         )}

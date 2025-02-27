@@ -2,27 +2,27 @@
 const selectOptions = {
     bpSubPortfolio: [
       { value: '', label: 'Select a SubPortfolio' },
-    { value: 'mandc', label: 'M&C (CandP2 (B2C))' },
-    { value: 'pulse', label: 'Pulse (CandP1 (Pulse))' },
-    { value: 'aviation', label: 'Aviation' },
-    { value: 'fleet', label: 'Fleet' },
-    { value: 'castrol', label: 'Castrol' },
-    { value: 'sustainability', label: 'Sustainability' },
-    { value: 'crm', label: 'CRM' },
+    { value: 'M&C (CandP2 (B2C))', label: 'M&C (CandP2 (B2C))' },
+    { value: 'Pulse (CandP1 (Pulse))', label: 'Pulse (CandP1 (Pulse))' },
+    { value: 'Aviation', label: 'Aviation' },
+    { value: 'Fleet', label: 'Fleet' },
+    { value: 'Castrol', label: 'Castrol' },
+    { value: 'Sustainability', label: 'Sustainability' },
+    { value: 'CRM', label: 'CRM' },
     ],
     contractType: [
       { value: '', label: 'Select a Contract Type' },
-      { value: 'milestone', label: 'Milestone' },
-      { value: 'fullTeam', label: 'FullTeam' },
-      { value: 'resources', label: 'Resources' },
-      { value: 'sustain', label: 'Sustain' },
+      { value: 'Milestone', label: 'Milestone' },
+      { value: 'FullTeam', label: 'FullTeam' },
+      { value: 'Resources', label: 'Resources' },
+      { value: 'Sustain', label: 'Sustain' },
     ],
     teamType: [
       { value: '', label: 'Select a Team Type' },
-      { value: 'devops', label: 'DevOps' },
-      { value: 'opsdev', label: 'OpsDev' },
-      { value: 'ops', label: 'Ops' },
-      { value: 'dev', label: 'Dev' }
+      { value: 'DevOps', label: 'DevOps' },
+      { value: 'OpsDev', label: 'OpsDev' },
+      { value: 'Ops', label: 'Ops' },
+      { value: 'Dev', label: 'Dev' }
     ],
     contractCurrency: [
       { value: '', label: 'Select a Currency' },

@@ -5,7 +5,12 @@ import "./styles.css";
 import { useAtom } from "jotai";
 import { contractDataAtom } from "../../atoms/contractAtoms";
 
-const ContractManagementModal = ({ showModal, onClose, modalType, modalData = {} }) => {
+const ContractManagementModal = ({
+  showModal,
+  onClose,
+  modalType,
+  modalData = {},
+}) => {
   const [formData, setFormData] = useState({
     bpSubPortfolio: "",
     contractName: "",
@@ -266,7 +271,16 @@ const ContractManagementModal = ({ showModal, onClose, modalType, modalData = {}
                   aria-labelledby="headingThree"
                   data-bs-parent="#accordionExample"
                 >
-                  <div >
+                  <div>
+                    {modalType !== "view" && (
+                      <Button
+                        className="add-year-button"
+                        variant="primary"
+                        onClick={addNewYear}
+                      >
+                        Add New Year
+                      </Button>
+                    )}
                     {Object.keys(formData.years).map((year, index) => (
                       <div className="milestone-section" key={year}>
                         <div className="milestone-header">
@@ -279,7 +293,10 @@ const ContractManagementModal = ({ showModal, onClose, modalType, modalData = {}
                             readOnly={modalType === "view"}
                           />
                           {modalType !== "view" && (
-                            <button onClick={() => deleteYear(year)} disabled={index === 0}>
+                            <button
+                              onClick={() => deleteYear(year)}
+                              disabled={index === 0}
+                            >
                               Delete
                             </button>
                           )}
@@ -292,17 +309,14 @@ const ContractManagementModal = ({ showModal, onClose, modalType, modalData = {}
                                 type="text"
                                 name={`${year}-${month}`}
                                 value={formData.years[year][month]}
-                                onChange={(e) => handleYearChange(e, year, month)}
+                                onChange={(e) =>
+                                  handleYearChange(e, year, month)
+                                }
                                 readOnly={modalType === "view"}
                               />
                             </div>
                           ))}
                         </div>
-                        {modalType !== "view" && index === Object.keys(formData.years).length - 1 && (
-                          <Button className="add-year-button" variant="primary" onClick={addNewYear}>
-                            Add New Year
-                          </Button>
-                        )}
                       </div>
                     ))}
                   </div>

@@ -10,6 +10,7 @@ import { contractDataAtom, ContractReq } from "../../atoms/contractAtoms";
 import { useAtom } from "jotai";
 import { CSVLink } from 'react-csv';
 import * as XLSX from 'xlsx';
+import ContractManagementModal from "../contractManagementModal/contractManagementModal";
 interface Request {
   id: string;
   dateRequested: string;
@@ -23,41 +24,6 @@ interface Request {
 }
 function DemandView() {
   const itemsPerPage = 5;
-  // const data: Request[] = [
-  //   {
-  //     id: "1",
-  //     dateRequested: "01-Dec-2024",
-  //     requestedBy: "Chiranjeevi",
-  //     appName: "App 1",
-  //     location: "London",
-  //     skills: "JavaScript",
-  //     roll: "Developer",
-  //     duration: "6 months",
-  //     status: "Open",
-  //   },
-  //   {
-  //     id: "2",
-  //     dateRequested: "11-Dec-2024",
-  //     requestedBy: "Rahim",
-  //     appName: "App 2",
-  //     location: "Pune",
-  //     skills: "React, Node",
-  //     roll: "Developer",
-  //     duration: "3 months",
-  //     status: "Open",
-  //   },
-  //   {
-  //     id: "3",
-  //     dateRequested: "20-Dec-2024",
-  //     requestedBy: "Chiranjeevi",
-  //     appName: "App 3",
-  //     location: "Pune",
-  //     skills: "Angular",
-  //     roll: "Developer",
-  //     duration: "9 months",
-  //     status: "Closed",
-  //   },
-  // ];
   const [query, setQuery] = useState<string>("");
   const [totalItems, setTotalItems] = useState(0);
   const [filteredData, setFilteredData] = useState<ContractReq[] | undefined>(
@@ -104,7 +70,7 @@ function DemandView() {
             item.referencePO?.toLowerCase().includes(query?.toLowerCase()) ||
             item.PORevision?.toLowerCase().includes(query?.toLowerCase()) ||
             item.contractCurrency?.toLowerCase().includes(query?.toLowerCase()) ||
-            item.subPortfolio?.toLowerCase().includes(query?.toLowerCase()) ||
+            item.contractFGID?.toLowerCase().includes(query?.toLowerCase()) ||
             item.revenueType?.toLowerCase().includes(query?.toLowerCase())
           );
        // setTotalItems(Math.ceil(filtered.length / itemsPerPage));
@@ -132,6 +98,10 @@ function DemandView() {
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber);
   };
+  const handleCloseModel = () => {
+    setShowModal(false);
+    setModalData({});
+  };
     const handleBulkUpload = (event:any) => {
       const file = event.target.files[0];
       const reader = new FileReader();
@@ -154,6 +124,12 @@ function DemandView() {
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   return (
     <>
+    <ContractManagementModal
+     showModal={showModal}
+     onClose={() => handleCloseModel()}
+     modalType={modalType}
+     modalData={modalType === "edit" || modalType === "view"  ? modalData : undefined}
+    />
     <div className="d-flex justify-content-between mt-5 mb-4">
       <SearchComponent onSearch={handleSearchChange} />
        <div className="d-flex align-items-center">
@@ -179,7 +155,7 @@ function DemandView() {
       <Table>
         <thead>
           <tr>
-            <td>ID</td>
+            {/* <td>ID</td> */}
             <td>Contract Name</td>
             <td>bp SubPortfolio</td>
             <td>Contract Type</td>
@@ -187,7 +163,7 @@ function DemandView() {
             <td>Reference PO</td>
             <td>PO Revision</td>
             <td>Contract Currency</td>
-            <td>Sub Portfolio</td>
+            <td>Contract FGID</td>
             <td>Revenue Type</td>
           </tr>
         </thead>
@@ -199,22 +175,23 @@ function DemandView() {
                   style={{ color: "blue", textDecoration: "underline", cursor: "pointer" }}
                   onClick={() => handleModal("view", request)}
                 >
-                  {request.id}
+                  {request.contractName}
                 </td>
-                <td>{request.contractName}</td>
+                {/* <td>{request.id}</td> */}
                 <td>{request.bpSubPortfolio}</td>
                 <td>{request.contractType}</td>
                 <td>{request.teamType}</td>
                 <td>{request.referencePO}</td>
                 <td>{request.PORevision}</td>
                 <td>{request.contractCurrency}</td>
-                <td>{request.subPortfolio}</td>
+                <td>{request.contractFGID}</td>
                 <td>{request.revenueType}</td>
                 <td>
                   <Button
                     variant="outline-secondary"
                     size="sm"
                     className="rounded-btn"
+                    onClick={() => handleModal("edit",request)}
                   >
                     Edit
                   </Button>

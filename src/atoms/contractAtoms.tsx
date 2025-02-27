@@ -7,10 +7,7 @@ export interface ContractReq {
    contractType: string;
    discountPercentage: number;
    teamType: string;
-   ReferencePO: number;
    PORevision: string;
-   Year: number;
-   subPortfolio: string;
    contractProgram: string;
    contractCSG: string;
    revenueType: string;
@@ -28,6 +25,7 @@ export interface ContractReq {
    linkedDPSNumber: number;
    infosysContractType: string;
    totalSoWWorkers: number;
+   years: any;
    
 }
 // Atom for storing team data

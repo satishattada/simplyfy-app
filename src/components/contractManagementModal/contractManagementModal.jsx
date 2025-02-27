@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Button } from "react-bootstrap";
 import InputField from "../inputField/inputField";
+import SelectField from "../selectField/selectField";
 import "./styles.css";
 import { useAtom } from "jotai";
 import { contractDataAtom } from "../../atoms/contractAtoms";
+import { nodeModuleNameResolver } from "typescript";
+import selectOptions from '../../data/dropDown';
 
 const ContractManagementModal = ({
   showModal,
@@ -38,7 +41,32 @@ const ContractManagementModal = ({
     totalSoWWorkers: "",
     years: {},
   });
-
+  const [errors, setErrors] = useState({
+    bpSubPortfolio: "",
+    contractName: "",
+    contractType: "",
+    discountPercentage: "",
+    teamType: "",
+    contractCurrency: "",
+    contractFGID: "",
+    referencePO: "",
+    PORevision: "",
+    contractProgram: "",
+    contractCSG: "",
+    revenueType: "",
+    contractStartDate: "",
+    contractEndDate: "",
+    POAmountOMS: "",
+    POAmountFG: "",
+    POAmountAriba: "",
+    masterProjectCode: "",
+    masterProjectCodePM: "",
+    masterPU: "",
+    LOENumber: "",
+    linkedDPSNumber: "",
+    infosysContractType: "",
+    totalSoWWorkers: "",
+  });
   const [contractData, setContractData] = useAtom(contractDataAtom);
 
   useEffect(() => {
@@ -56,8 +84,43 @@ const ContractManagementModal = ({
       ...prevData,
       [name]: value,
     }));
+    const error = validateField(name, value);
+    setErrors({
+      ...errors,
+      [name]: error,
+    });
   };
-
+  const validateField = (name, value) => {
+    let error = "";
+     console.log("inside name...........",name);
+     console.log("inside value..........",value);
+    if (name === "contractName") {
+      if (!value) {
+        error = "Contract Name is required";
+      } else if (value.length < 2) {
+        error = "Contract Name must be at least 2 characters long";
+      }
+    } else if (name === "contractType") {
+      if (!value) {
+        error = "Contract Type is required";
+      }
+    } else if (name === "teamType") {
+      if (!value) {
+        error = "Team Type is required";
+      }
+    } else if (name === "referencePO") {
+      if (!value) {
+        error = "Reference PO is required";
+      }
+    } else if(name === 'bpSubPortfolio'){
+      if (!value) {
+        error = "BP sub portfolio is required";
+      }
+    }
+    console.log("inside name is........", name);
+    console.log("inside error........", error);
+    return error;
+  };
   const handleYearChange = (e, year, month) => {
     const value = e.target.value;
     setFormData((prevData) => ({
@@ -162,38 +225,78 @@ const ContractManagementModal = ({
   };
 
   const bpReportingFields = [
-    { label: "BP Sub Portfolio", name: "bpSubPortfolio" },
-    { label: "Contract Name", name: "contractName" },
-    { label: "Contract Type", name: "contractType" },
-    { label: "Discount Percentage", name: "discountPercentage" },
-    { label: "Team Type", name: "teamType" },
-    { label: "Contract Currency", name: "contractCurrency" },
-    { label: "Contract FGID", name: "contractFGID" },
-    { label: "Reference PO", name: "referencePO" },
-    { label: "PO Revision", name: "PORevision" },
+    {
+      label: "BP Sub Portfolio",
+      name: "bpSubPortfolio",
+      fieldType: "dropdown",
+    },
+    { label: "Contract Name", name: "contractName", fieldType: "text" },
+    { label: "Contract Type", name: "contractType", fieldType: "dropdown" },
+    {
+      label: "Discount Percentage",
+      name: "discountPercentage",
+      fieldType: "text",
+    },
+    { label: "Team Type", name: "teamType", fieldType: "dropdown" },
+    {
+      label: "Contract Currency",
+      name: "contractCurrency",
+      fieldType: "dropdown",
+    },
+    { label: "Contract FGID", name: "contractFGID", fieldType: "text" },
+    { label: "Reference PO", name: "referencePO", fieldType: "text" },
+    { label: "PO Revision", name: "PORevision", fieldType: "text" },
   ];
 
   const contractsTrackerFields = [
-    { label: "BP Sub Portfolio", name: "bpSubPortfolio" },
-    { label: "Contract Program (Mission / Program)", name: "contractProgram" },
-    { label: "Contract CSG", name: "contractCSG" },
-    { label: "Revenue Type", name: "revenueType" },
-    { label: "Contract Name", name: "contractName" },
-    { label: "Contract FGID", name: "contractFGID" },
-    { label: "Contract Start Date", name: "contractStartDate" },
-    { label: "Contract End Date", name: "contractEndDate" },
-    { label: "Contract Currency", name: "contractCurrency" },
-    { label: "Reference PO", name: "referencePO" },
-    { label: "PO Amount OMS", name: "POAmountOMS" },
-    { label: "PO Amount FG", name: "POAmountFG" },
-    { label: "PO Amount Ariba", name: "POAmountAriba" },
-    { label: "Master Project Code", name: "masterProjectCode" },
-    { label: "Master Project Code PM", name: "masterProjectCodePM" },
-    { label: "Master PU", name: "masterPU" },
-    { label: "LOE Number", name: "LOENumber" },
-    { label: "Linked DPS Number", name: "linkedDPSNumber" },
-    { label: "Infosys Contract Type", name: "infosysContractType" },
-    { label: "Total SoW Workers", name: "totalSoWWorkers" },
+    {
+      label: "BP Sub Portfolio",
+      name: "bpSubPortfolio",
+      fieldType: "dropdown",
+    },
+    {
+      label: "Contract Program (Mission / Program)",
+      name: "contractProgram",
+      fieldType: "dropdown",
+    },
+    { label: "Contract CSG", name: "contractCSG", fieldType: "text" },
+    { label: "Revenue Type", name: "revenueType", fieldType: "dropdown" },
+    { label: "Contract Name", name: "contractName", fieldType: "text" },
+    { label: "Contract FGID", name: "contractFGID", fieldType: "text" },
+    {
+      label: "Contract Start Date",
+      name: "contractStartDate",
+      fieldType: "text",
+    },
+    { label: "Contract End Date", name: "contractEndDate", fieldType: "text" },
+    {
+      label: "Contract Currency",
+      name: "contractCurrency",
+      fieldType: "dropdown",
+    },
+    { label: "Reference PO", name: "referencePO", fieldType: "text" },
+    { label: "PO Amount OMS", name: "POAmountOMS", fieldType: "text" },
+    { label: "PO Amount FG", name: "POAmountFG", fieldType: "text" },
+    { label: "PO Amount Ariba", name: "POAmountAriba", fieldType: "text" },
+    {
+      label: "Master Project Code",
+      name: "masterProjectCode",
+      fieldType: "text",
+    },
+    {
+      label: "Master Project Code PM",
+      name: "masterProjectCodePM",
+      fieldType: "text",
+    },
+    { label: "Master PU", name: "masterPU", fieldType: "text" },
+    { label: "LOE Number", name: "LOENumber", fieldType: "text" },
+    { label: "Linked DPS Number", name: "linkedDPSNumber", fieldType: "text" },
+    {
+      label: "Infosys Contract Type",
+      name: "infosysContractType",
+      fieldType: "dropdown",
+    },
+    { label: "Total SoW Workers", name: "totalSoWWorkers", fieldType: "text" },
   ];
 
   return (
@@ -238,16 +341,40 @@ const ContractManagementModal = ({
                 >
                   <div className="accordion-body">
                     {bpReportingFields.map((field) => (
-                      <div className="inputField" key={field.name}>
-                        <InputField
-                          label={field.label}
-                          type="text"
-                          name={field.name}
-                          value={formData[field.name]}
-                          onChange={(e) => handleChange(e, field.name)}
-                          readOnly={modalType === "view"}
-                        />
-                      </div>
+                      <span>
+                        {field.fieldType === "text" ? (
+                          <div className="inputField" key={field.name}>
+                            <InputField
+                              label={field.label}
+                              type="text"
+                              name={field.name}
+                              value={formData[field.name]}
+                              onChange={(e) => handleChange(e, field.name)}
+                              readOnly={modalType === "view"}
+                            />
+                          </div>
+                        ) : (
+                          <div className="inputSelectField" key={field.name}>
+                            <SelectField
+                              label={field.label}
+                              value={formData[field.name]}
+                              onChange={(e) => handleChange(e, field.name)}
+                              options={selectOptions[field.name] || []}
+                            />
+                          </div>
+                        )}
+                        {errors[field.name] && (
+                          <span
+                            style={{
+                              color: "red",
+                              marginLeft: "13px",
+                              display: "block",
+                            }}
+                          >
+                            {errors[field.name]}
+                          </span>
+                        )}
+                      </span>
                     ))}
                   </div>
                 </div>
@@ -343,16 +470,39 @@ const ContractManagementModal = ({
                 >
                   <div className="accordion-body">
                     {contractsTrackerFields.map((field) => (
-                      <div className="inputField" key={field.name}>
-                        <InputField
-                          label={field.label}
-                          type="text"
-                          name={field.name}
-                          value={formData[field.name]}
-                          onChange={(e) => handleChange(e, field.name)}
-                          readOnly={modalType === "view"}
-                        />
-                      </div>
+                      <>
+                        {field.fieldType === "text" ? (
+                          <div className="inputField" key={field.name}>
+                            <InputField
+                              label={field.label}
+                              type="text"
+                              name={field.name}
+                              value={formData[field.name]}
+                              onChange={(e) => handleChange(e, field.name)}
+                              readOnly={modalType === "view"}
+                            />
+                          </div>
+                        ) : (
+                          <div className="inputSelectField" key={field.name}>
+                            <SelectField
+                              label={field.label}
+                              value={formData[field.name]}
+                              onChange={(e) =>
+                                setFormData({
+                                  ...modalData,
+                                  years: e.target.value,
+                                })
+                              }
+                              options={[
+                                {
+                                  value: formData[field.name],
+                                  label: formData[field.name],
+                                },
+                              ]}
+                            />
+                          </div>
+                        )}
+                      </>
                     ))}
                   </div>
                 </div>

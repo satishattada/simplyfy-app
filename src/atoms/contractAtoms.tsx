@@ -1,6 +1,7 @@
 import { atom } from 'jotai';
 
 export interface ContractReq {
+   month: { [s: string]: unknown; } | ArrayLike<unknown>;
    id: number;
    bpSubPortfolio: string;
    contractName: string;
@@ -25,8 +26,8 @@ export interface ContractReq {
    linkedDPSNumber: number;
    infosysContractType: string;
    totalSoWWorkers: number;
-   years: any;
-   
+   year: any;
+   milestoneAmount: any;
 }
 // Atom for storing team data
 export const contractDataAtom = atom<ContractReq[]>([]);

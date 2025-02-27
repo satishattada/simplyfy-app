@@ -129,7 +129,16 @@ function DemandView() {
   };
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   const downloadExcel = () => {
-    const ws = XLSX.utils.json_to_sheet(contractData);
+    const flattenedData = contractData.flatMap(item => {
+      return item.milestoneAmount.map((yearData: any) => {
+        return {
+          ...item,
+          year: yearData.year,
+          ...yearData.month,
+        };
+      });
+    });
+    const ws = XLSX.utils.json_to_sheet(flattenedData);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
     const wbout = XLSX.write(wb, { bookType: "xls", type: "binary" });

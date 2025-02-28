@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
 import "./styles.css";
 import Table from "react-bootstrap/Table";
-import { Pagination } from 'react-bootstrap';
+import { Pagination } from "react-bootstrap";
 import { Form, InputGroup, Button } from "react-bootstrap";
 import { FaSearch, FaTimes } from "react-icons/fa";
 import contractsService from "../../services/contractsService";
 import SearchComponent from "../search/searchComponent";
 import { contractDataAtom, ContractReq } from "../../atoms/contractAtoms";
 import { useAtom } from "jotai";
-import { CSVLink } from 'react-csv';
-import * as XLSX from 'xlsx';
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 import ContractManagementModal from "../contractManagementModal/contractManagementModal";
 interface Request {
   id: string;
@@ -27,8 +27,8 @@ function DemandView() {
   const [query, setQuery] = useState<string>("");
   const [totalItems, setTotalItems] = useState(0);
   const [filteredData, setFilteredData] = useState<ContractReq[] | undefined>(
-      undefined
-    );
+    undefined
+  );
   const [showModal, setShowModal] = useState<boolean>(false);
   const [modalType, setModalType] = useState<string>("add");
   const [modalData, setModalData] = useState<object>({});
@@ -43,43 +43,49 @@ function DemandView() {
       .getContractsData()
       .then((resp) => {
         const reponse = resp as ContractReq[];
-        setTeamData(reponse)
+        setTeamData(reponse);
         setTotalItems(reponse.length);
-        
-     }) //set item count
+      }) //set item count
       .catch((err) => {
         console.log(err);
       });
   }, []);
-   useEffect(() => {
-      if (query === "" || query === undefined) {
-        //setTotalItems(Math.ceil(teamData.length / itemsPerPage));
-       // 
-        const startIndex = (currentPage - 1) * itemsPerPage;
-        const currentItems = contractData.slice(startIndex, startIndex + itemsPerPage);
-        setFilteredData(currentItems); // Show all data if the search query is empty
-      } else {
-        // Filter data based on the query
-        const filtered = contractData && contractData?.filter(
+  useEffect(() => {
+    if (query === "" || query === undefined) {
+      //setTotalItems(Math.ceil(teamData.length / itemsPerPage));
+      //
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      const currentItems = contractData.slice(
+        startIndex,
+        startIndex + itemsPerPage
+      );
+      setFilteredData(currentItems); // Show all data if the search query is empty
+    } else {
+      // Filter data based on the query
+      const filtered =
+        contractData &&
+        contractData?.filter(
           (item: any) =>
-            item.id.includes(query) ||
+            item.id.toString().includes(query) ||
             item.contractName?.toLowerCase().includes(query?.toLowerCase()) ||
             item.bpSubPortfolio?.toLowerCase().includes(query?.toLowerCase()) ||
             item.contractType?.toLowerCase().includes(query?.toLowerCase()) ||
             item.teamType?.toLowerCase().includes(query?.toLowerCase()) ||
-            item.referencePO?.toLowerCase().includes(query?.toLowerCase()) ||
+            item.referencePO?.toString().includes(query?.toLowerCase()) ||
             item.PORevision?.toLowerCase().includes(query?.toLowerCase()) ||
             item.contractCurrency?.toLowerCase().includes(query?.toLowerCase()) ||
             item.contractFGID?.toLowerCase().includes(query?.toLowerCase()) ||
             item.revenueType?.toLowerCase().includes(query?.toLowerCase())
-          );
-       // setTotalItems(Math.ceil(filtered.length / itemsPerPage));
-        const startIndex = (currentPage - 1) * itemsPerPage;
-        const currentItems = filtered.slice(startIndex, startIndex + itemsPerPage);
-        console.log("inside currentItems...........",currentItems);
-        setFilteredData(currentItems);
-      }
-    }, [contractData, query, currentPage]);
+        );
+      // setTotalItems(Math.ceil(filtered.length / itemsPerPage));
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      const currentItems = filtered.slice(
+        startIndex,
+        startIndex + itemsPerPage
+      );
+      setFilteredData(currentItems);
+    }
+  }, [contractData, query, currentPage]);
   const handleModal = (type: string, request?: any) => {
     setShowModal(true);
     setModalType(type);
@@ -115,13 +121,40 @@ function DemandView() {
           console.log(jsonData);
           const newData = jsonData.filter((newItem: any) => 
             !contractData.some((existingItem) => existingItem.id === newItem.id)
-          );
-          setTeamData((prevData) => [...prevData, ...(newData as ContractReq[])]);
-        }
-      };
-      reader.readAsArrayBuffer(file);
+        );
+        setTeamData((prevData) => [...prevData, ...(newData as ContractReq[])]);
+      }
     };
+    reader.readAsArrayBuffer(file);
+  };
   const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const downloadExcel = () => {
+    const flattenedData = contractData.flatMap(item => {
+      return item.milestoneAmount.map((yearData: any) => {
+        return {
+          ...item,
+          year: yearData.year,
+          ...yearData.month,
+        };
+      });
+    });
+    const ws = XLSX.utils.json_to_sheet(flattenedData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+    const wbout = XLSX.write(wb, { bookType: "xls", type: "binary" });
+    const blob = new Blob([s2ab(wbout)], { type: "application/octet-stream" });
+    saveAs(blob, `contracts.xls`);
+  };
+
+  // Function to convert a binary string to an array buffer
+  const s2ab = (s: string) => {
+    const buf = new ArrayBuffer(s.length);
+    const view = new Uint8Array(buf);
+    for (let i = 0; i < s.length; i++) {
+      view[i] = s.charCodeAt(i) & 0xff;
+    }
+    return buf;
+  };
   return (
     <>
     <ContractManagementModal
@@ -137,9 +170,7 @@ function DemandView() {
                   className="bi bi-plus-circle edit-btn mx-2"
                   onClick={() => handleModal("add",{})}
                 ></i>
-                <CSVLink data={contractData} filename="employee-details.csv" target="_blank">
-                  <i className="bi bi-filetype-csv export-btn mx-2"></i>
-                </CSVLink>
+                  <i className="bi bi-filetype-csv export-btn mx-2" onClick={downloadExcel}></i>
                 <input
                   type="file"
                   accept=".xlsx, .xls"
@@ -165,6 +196,7 @@ function DemandView() {
             <td>Contract Currency</td>
             <td>Contract FGID</td>
             <td>Revenue Type</td>
+            <td>Action</td>
           </tr>
         </thead>
         <tbody>
@@ -172,7 +204,11 @@ function DemandView() {
             filteredData.map((request) => (
               <tr key={request.id}>
                 <td
-                  style={{ color: "blue", textDecoration: "underline", cursor: "pointer" }}
+                  style={{
+                    color: "blue",
+                    textDecoration: "underline",
+                    cursor: "pointer",
+                  }}
                   onClick={() => handleModal("view", request)}
                 >
                   {request.contractName}
@@ -221,7 +257,9 @@ function DemandView() {
           </Pagination.Item>
         ))}
         <Pagination.Next
-          onClick={() => handlePageChange(Math.min(currentPage + 1, totalPages))}
+          onClick={() =>
+            handlePageChange(Math.min(currentPage + 1, totalPages))
+          }
         />
       </Pagination>
     </>

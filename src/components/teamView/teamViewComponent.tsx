@@ -9,8 +9,8 @@ import { withParamsAndNavigate } from "../../routes/with-params-navigate";
 import teamService from "../../services/teamService";
 import { teamDataAtom, TeamReq } from "../../atoms/teamAtoms";
 import { useAtom } from "jotai";
-import { CSVLink } from 'react-csv';
 import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 function TeamViewComponent() {
   const itemsPerPage = 5;
   const [currentPage, setCurrentPage] = useState(1);
@@ -119,7 +119,24 @@ function TeamViewComponent() {
     reader.readAsArrayBuffer(file);
   };
 
+const downloadExcel = () => {
+    const ws = XLSX.utils.json_to_sheet(teamData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+    const wbout = XLSX.write(wb, { bookType: 'xls', type: 'binary' });
+    const blob = new Blob([s2ab(wbout)], { type: 'application/octet-stream' });
+    saveAs(blob, `employee-details.xls`);
+  };
 
+  // Function to convert a binary string to an array buffer
+  const s2ab = (s: string) => {
+    const buf = new ArrayBuffer(s.length);
+    const view = new Uint8Array(buf);
+    for (let i = 0; i < s.length; i++) {
+      view[i] = s.charCodeAt(i) & 0xff;
+    }
+    return buf;
+  };
   return (
     <>
       <AddTeamModal
@@ -135,9 +152,7 @@ function TeamViewComponent() {
             className="bi bi-plus-circle edit-btn mx-2"
             onClick={() => handleModal("add",{})}
           ></i>
-          <CSVLink data={teamData} filename="employee-details.csv" target="_blank">
-            <i className="bi bi-filetype-csv export-btn mx-2"></i>
-          </CSVLink>
+          <i className="bi bi-filetype-csv export-btn mx-2" onClick={downloadExcel}></i>
           <input
             type="file"
             accept=".xlsx, .xls"

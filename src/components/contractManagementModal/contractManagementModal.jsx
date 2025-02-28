@@ -364,6 +364,7 @@ const ContractManagementModal = ({ showModal, onClose, modalType, modalData = {}
                               value={formData[field.name]}
                               onChange={(e) => handleChange(e, field.name)}
                               options={selectOptions[field.name] || []}
+                              readOnly={modalType === "view"}
                             />
                           </div>
                         )}
@@ -486,6 +487,7 @@ const ContractManagementModal = ({ showModal, onClose, modalType, modalData = {}
                                 handleChange(e, field.name)
                               }
                               options={selectOptions[field.name] || []}
+                              readOnly={modalType === "view"}
                             />
                           </div>
                         )}

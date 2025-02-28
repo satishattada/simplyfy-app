@@ -5,12 +5,7 @@ import "./styles.css";
 import { useAtom } from "jotai";
 import { contractDataAtom } from "../../atoms/contractAtoms";
 
-const ContractManagementModal = ({
-  showModal,
-  onClose,
-  modalType,
-  modalData = {},
-}) => {
+const ContractManagementModal = ({ showModal, onClose, modalType, modalData = {} }) => {
   const [formData, setFormData] = useState({
     bpSubPortfolio: "",
     contractName: "",
@@ -36,19 +31,23 @@ const ContractManagementModal = ({
     linkedDPSNumber: "",
     infosysContractType: "",
     totalSoWWorkers: "",
-    years: {},
+    milestoneAmount: [],
   });
 
   const [contractData, setContractData] = useAtom(contractDataAtom);
+  const [initialYearAdded, setInitialYearAdded] = useState(false);
 
   useEffect(() => {
     if (modalType === "edit" || modalType === "view") {
       setFormData({
         ...modalData,
-        years: modalData.years || {},
+        milestoneAmount: modalData.milestoneAmount || [],
       });
+    } else if (modalType === "add" && !initialYearAdded) {
+      addNewYear();
+      setInitialYearAdded(true);
     }
-  }, [modalType, modalData]);
+  }, [modalType, modalData, initialYearAdded]);
 
   const handleChange = (e, name) => {
     const value = e.target.value;
@@ -58,74 +57,78 @@ const ContractManagementModal = ({
     }));
   };
 
-  const handleYearChange = (e, year, month) => {
+  const handleYearChange = (e, yearIndex, month) => {
     const value = e.target.value;
-    setFormData((prevData) => ({
-      ...prevData,
-      years: {
-        ...prevData.years,
-        [year]: {
-          ...prevData.years[year],
-          [month]: value,
-        },
-      },
-    }));
-  };
-
-  const handleYearValueChange = (e, oldYear) => {
-    const newYear = e.target.value;
-    if (newYear in formData.years) {
-      alert("Year already exists. Please enter a unique year.");
-      return;
-    }
     setFormData((prevData) => {
-      const updatedYears = { ...prevData.years };
-      updatedYears[newYear] = updatedYears[oldYear];
-      delete updatedYears[oldYear];
-      return { ...prevData, years: updatedYears };
+      const updatedMilestoneAmount = [...prevData.milestoneAmount];
+      updatedMilestoneAmount[yearIndex].month[month] = value;
+      return { ...prevData, milestoneAmount: updatedMilestoneAmount };
     });
   };
 
+  const handleYearValueChange = (e, yearIndex) => {
+    const newYear = e.target.value;
+    setFormData((prevData) => {
+      const updatedMilestoneAmount = [...prevData.milestoneAmount];
+      updatedMilestoneAmount[yearIndex].year = newYear;
+      return { ...prevData, milestoneAmount: updatedMilestoneAmount };
+    });
+  };
+
+
   const addNewYear = () => {
-    const newYear = "";
+    const existingYears = formData.milestoneAmount.map((milestone) => milestone.year);
+    if (existingYears.includes("")) {
+      alert("Please fill in the existing year before adding a new one.");
+      return;
+    }
     setFormData((prevData) => ({
       ...prevData,
-      years: {
-        ...prevData.years,
-        [newYear]: {
-          jan: "",
-          feb: "",
-          mar: "",
-          apr: "",
-          may: "",
-          jun: "",
-          jul: "",
-          aug: "",
-          sep: "",
-          oct: "",
-          nov: "",
-          dec: "",
+      milestoneAmount: [
+        ...prevData.milestoneAmount,
+        {
+          year: "",
+          month: {
+            jan: "",
+            feb: "",
+            mar: "",
+            apr: "",
+            may: "",
+            jun: "",
+            jul: "",
+            aug: "",
+            sep: "",
+            oct: "",
+            nov: "",
+            dec: "",
+          },
         },
-      },
+      ],
     }));
   };
 
-  const deleteYear = (year) => {
+  const deleteYear = (yearIndex) => {
     setFormData((prevData) => {
-      const updatedYears = { ...prevData.years };
-      delete updatedYears[year];
-      return { ...prevData, years: updatedYears };
+      const updatedMilestoneAmount = [...prevData.milestoneAmount];
+      updatedMilestoneAmount.splice(yearIndex, 1);
+      return { ...prevData, milestoneAmount: updatedMilestoneAmount };
     });
   };
 
   const onSaveChanges = () => {
+    const cleanedMilestoneAmount = formData.milestoneAmount.filter(
+      (milestone) => milestone.year !== "" && Object.values(milestone.month).some((value) => value !== "")
+    );
+
+    const updatedFormData = { ...formData, milestoneAmount: cleanedMilestoneAmount };
+
     if (modalType === "edit") {
-      const updatedTeamData = contractData.map((item) =>
-        item.employeeNumber === formData.employeeNumber ? formData : item
+      const updatedContractData = contractData.map((item) =>
+        item.id === updatedFormData.id ? updatedFormData : item
       );
-      setContractData(updatedTeamData);
+      setContractData(updatedContractData);
     } else {
-      setContractData([...contractData, formData]);
+      setContractData([...contractData, updatedFormData]);
     }
     handleCloseModal();
   };
@@ -156,8 +159,9 @@ const ContractManagementModal = ({
       linkedDPSNumber: "",
       infosysContractType: "",
       totalSoWWorkers: "",
-      years: {},
+      milestoneAmount: [],
     });
+    setInitialYearAdded(false);
     onClose();
   };
 
@@ -271,52 +275,43 @@ const ContractManagementModal = ({
                   aria-labelledby="headingThree"
                   data-bs-parent="#accordionExample"
                 >
-                  <div>
-                    {modalType !== "view" && (
-                      <Button
-                        className="add-year-button"
-                        variant="primary"
-                        onClick={addNewYear}
-                      >
-                        Add New Year
-                      </Button>
-                    )}
-                    {Object.keys(formData.years).map((year, index) => (
-                      <div className="milestone-section" key={year}>
+                  <div >
+                    {formData.milestoneAmount.map((milestone, index) => (
+                      <div className="milestone-section" key={index}>
                         <div className="milestone-header">
                           <InputField
                             label="Year"
                             type="text"
-                            name={`year-${year}`}
-                            value={year}
-                            onChange={(e) => handleYearValueChange(e, year)}
+                            name={`year-${index}`}
+                            value={milestone.year}
+                            onChange={(e) => handleYearValueChange(e, index)}
                             readOnly={modalType === "view"}
                           />
-                          {modalType !== "view" && (
-                            <button
-                              onClick={() => deleteYear(year)}
-                              disabled={index === 0}
-                            >
+                          {modalType !== "view" && index !== 0 && (
+                            <button onClick={() => deleteYear(index)} disabled={formData.milestoneAmount.length === 1}>
                               Delete
                             </button>
                           )}
                         </div>
                         <div className="milestone-months">
-                          {Object.keys(formData.years[year]).map((month) => (
+                          {Object.keys(milestone.month).map((month) => (
                             <div className="milestone-month" key={month}>
                               <InputField
                                 label={month}
                                 type="text"
-                                name={`${year}-${month}`}
-                                value={formData.years[year][month]}
-                                onChange={(e) =>
-                                  handleYearChange(e, year, month)
-                                }
+                                name={`${index}-${month}`}
+                                value={milestone.month[month]}
+                                onChange={(e) => handleYearChange(e, index, month)}
                                 readOnly={modalType === "view"}
                               />
                             </div>
                           ))}
                         </div>
+                        {modalType !== "view" && index === formData.milestoneAmount.length - 1 && (
+                          <Button className="add-year-button" variant="primary" onClick={addNewYear}>
+                            Add New Year
+                          </Button>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -357,6 +352,7 @@ const ContractManagementModal = ({
                   </div>
                 </div>
               </div>
+
             </div>
           </div>
         </div>

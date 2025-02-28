@@ -25,7 +25,7 @@ export interface ContractReq {
    linkedDPSNumber: number;
    infosysContractType: string;
    totalSoWWorkers: number;
-   years: any;
+   milestoneAmount: any;
    
 }
 // Atom for storing team data

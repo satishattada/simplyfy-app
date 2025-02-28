@@ -24,7 +24,7 @@ interface contractReq {
   linkedDPSNumber: number;
   infosysContractType: string;
   totalSoWWorkers: number;
-  years: any;
+  milestoneAmount: any
 }
 
 const contractData = [
@@ -54,84 +54,44 @@ const contractData = [
     linkedDPSNumber: 5435,
     infosysContractType: "FP",
     totalSoWWorkers: 4,
-    years: {
-      2024: {
-        jan: "100",
-        feb: "270",
-        mar: "390",
-        apr: "470",
-        may: "50",
-        jun: "12",
-        jul: "46",
-        aug: "88",
-        sep: "86",
-        oct: "86",
-        nov: "",
-        dec: "",
+    milestoneAmount: [
+      {
+        year: 2024,
+        month: {
+          jan: "10",
+          feb: "20",
+          mar: "30",
+          apr: "40",
+          may: "50",
+          jun: "",
+          jul: "",
+          aug: "",
+          sep: "",
+          oct: "",
+          nov: "",
+          dec: "",
+        },
       },
-      2025: {
-        jan: "10",
-        feb: "20",
-        mar: "30",
-        apr: "40",
-        may: "50",
-        jun: "",
-        jul: "",
-        aug: "",
-        sep: "",
-        oct: "",
-        nov: "",
-        dec: "",
+      {
+        year: 2025,
+        month: {
+          jan: "10",
+          feb: "20",
+          mar: "30",
+          apr: "40",
+          may: "50",
+          jun: "",
+          jul: "",
+          aug: "",
+          sep: "",
+          oct: "",
+          nov: "",
+          dec: "",
+        },
       },
-    },
-  },
-  {
-    id: 2,
-    bpSubPortfolio: "Pulse (CandP1 (Pulse)",
-    contractName: "BP",
-    contractType: "Milestone",
-    discountPercentage: "10",
-    teamType: "DevOps",
-    contractCurrency: "USD",
-    contractFGID: "12345",
-    ReferencePO: "test",
-    PORevision: "Original",
-    subPortfolio: "M&C (CandP2 (B2C))",
-    contractProgram: "Consumer",
-    contractCSG: "",
-    revenueType: "Capex",
-    contractStartDate: "2024-01-01",
-    contractEndDate: "2026-12-31",
-    referencePO: "test",
-    POAmountOMS: "test",
-    POAmountFG: "test",
-    POAmountAriba: "test",
-    masterProjectCode: "test",
-    masterProjectCodePM: "test",
-    masterPU: 324,
-    LOENumber: 34324,
-    linkedDPSNumber: 5435,
-    infosysContractType: "FP",
-    totalSoWWorkers: 4,
-    years: {
-      2025: {
-        jan: "",
-        feb: "",
-        mar: "",
-        apr: "",
-        may: "",
-        jun: "",
-        jul: "",
-        aug: "",
-        sep: "",
-        oct: "",
-        nov: "",
-        dec: "",
-      },
-    },
+    ],
   },
 ];
-
 const getContractsData = () => {
   return new Promise((resolve) => {
     setTimeout(() => {

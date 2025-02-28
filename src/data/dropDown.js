@@ -48,6 +48,22 @@ const selectOptions = {
       { value: 'FP', label: 'FP' },
       { value: 'T&M', label: 'T&M' },
       { value: 'UOM', label: 'UOM' },
+    ],
+    contractProgram: [
+      { value: '', label: 'Select a Contract Program'},
+      { value: 'Consumer', label: 'Consumer'},
+      { value: 'Shared Services', label: 'Shared Services'}, 
+      { value: 'Site Operator', label: 'Site Operator'},
+      { value: 'C&P', label: 'C&P'}, 
+      { value: 'CVC', label: 'CVC'}, 
+      { value: 'Pulse', label: 'Pulse'}, 
+      { value: 'COT', label: 'COT'}, 
+      { value: 'Semarchy', label: 'Semarchy'}, 
+      { value: 'OneFleet', label: 'OneFleet'}, 
+      { value: 'CEP', label: 'CEP'}, 
+      { value: 'Castrol', label: 'Castrol'}, 
+      { value: 'Aviation Portal', label: 'Aviation Portal'}, 
+      { value: 'Safe2Go', label: 'Safe2Go'}
     ]
   };
 

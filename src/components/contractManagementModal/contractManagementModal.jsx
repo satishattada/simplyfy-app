@@ -137,12 +137,30 @@ const ContractManagementModal = ({ showModal, onClose, modalType, modalData = {}
       return { ...prevData, milestoneAmount: updatedMilestoneAmount };
     });
   };
+  const findDuplicateYears =(arr)=>{
+    const seen = new Set();
+    const duplicates = [];
 
+    for (const obj of arr) {
+        const year = obj.year;
+
+        if (seen.has(year)) {
+            duplicates.push(year); 
+        } else {
+            seen.add(year); 
+        }
+    }
+
+    return duplicates; 
+}
 
   const addNewYear = () => {
     const existingYears = formData.milestoneAmount.map((milestone) => milestone.year);
     if (existingYears.includes("")) {
       alert("Please fill in the existing year before adding a new one.");
+      return;
+    } else if(findDuplicateYears(formData.milestoneAmount).length > 0){
+      alert("Duplicate years are not allow.");
       return;
     }
     setFormData((prevData) => ({
@@ -195,7 +213,34 @@ const ContractManagementModal = ({ showModal, onClose, modalType, modalData = {}
     }
     handleCloseModal();
   };
-
+const resetErrorMessages=()=>{
+  setErrors({
+    bpSubPortfolio: "",
+    contractName: "",
+    contractType: "",
+    discountPercentage: "",
+    teamType: "",
+    contractCurrency: "",
+    contractFGID: "",
+    referencePO: "",
+    PORevision: "",
+    contractProgram: "",
+    contractCSG: "",
+    revenueType: "",
+    contractStartDate: "",
+    contractEndDate: "",
+    POAmountOMS: "",
+    POAmountFG: "",
+    POAmountAriba: "",
+    masterProjectCode: "",
+    masterProjectCodePM: "",
+    masterPU: "",
+    LOENumber: "",
+    linkedDPSNumber: "",
+    infosysContractType: "",
+    totalSoWWorkers: "",
+  })
+}
   const handleCloseModal = () => {
     setFormData({
       bpSubPortfolio: "",
@@ -225,6 +270,7 @@ const ContractManagementModal = ({ showModal, onClose, modalType, modalData = {}
       milestoneAmount: [],
     });
     setInitialYearAdded(false);
+    resetErrorMessages();
     onClose();
   };
 

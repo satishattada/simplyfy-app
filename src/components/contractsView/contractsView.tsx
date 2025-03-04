@@ -187,6 +187,7 @@ function DemandView() {
         <thead>
           <tr>
             {/* <td>ID</td> */}
+            <td>Contract FGID</td>
             <td>Contract Name</td>
             <td>bp SubPortfolio</td>
             <td>Contract Type</td>
@@ -194,7 +195,6 @@ function DemandView() {
             <td>Reference PO</td>
             <td>PO Revision</td>
             <td>Contract Currency</td>
-            <td>Contract FGID</td>
             <td>Revenue Type</td>
             <td>Action</td>
           </tr>
@@ -211,16 +211,15 @@ function DemandView() {
                   }}
                   onClick={() => handleModal("view", request)}
                 >
-                  {request.contractName}
+                  {request.contractFGID}
                 </td>
-                {/* <td>{request.id}</td> */}
+                <td>{request.contractName}</td>
                 <td>{request.bpSubPortfolio}</td>
                 <td>{request.contractType}</td>
                 <td>{request.teamType}</td>
                 <td>{request.referencePO}</td>
                 <td>{request.PORevision}</td>
                 <td>{request.contractCurrency}</td>
-                <td>{request.contractFGID}</td>
                 <td>{request.revenueType}</td>
                 <td>
                   <Button

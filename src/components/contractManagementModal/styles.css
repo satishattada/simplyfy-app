@@ -37,11 +37,19 @@ flex-direction: row;
 .milestone-section {
   margin-bottom: 20px;
   padding: 10px;
+}
+.year-section{
+  width: 10%;
+  float: left;
   border: 1px solid #ccc;
   border-radius: 5px;
   background-color: #f9f9f9;
+  padding: 8px 8px 8px 23px;
+    margin: 4px;
 }
-
+.year-section.active{
+  background-color: #009900;
+}
 .milestone-header {
   display: flex;
   justify-content: space-between;
@@ -84,4 +92,10 @@ flex-direction: row;
   width: 100%;
   margin-bottom: 20px;
   padding: 10px;
+}
+.month-textfield{
+  width: 9%;
+}
+.milestone-section .inputFieldcontainer{
+  width: 10%;
 }

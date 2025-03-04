@@ -6,9 +6,16 @@ import "./styles.css";
 import { useAtom } from "jotai";
 import { contractDataAtom } from "../../atoms/contractAtoms";
 import { nodeModuleNameResolver } from "typescript";
-import selectOptions from '../../data/dropDown';
+import selectOptions from "../../data/dropDown";
+import Table from "react-bootstrap/Table";
 
-const ContractManagementModal = ({ showModal, onClose, modalType, modalData = {} }) => {
+const ContractManagementModal = ({
+  showModal,
+  onClose,
+  modalType,
+  modalData = {},
+}) => {
+  const [selectedRevision, setSelectedRevision] = useState(null);
   const [formData, setFormData] = useState({
     bpSubPortfolio: "",
     contractName: "",
@@ -64,7 +71,26 @@ const ContractManagementModal = ({ showModal, onClose, modalType, modalData = {}
   });
   const [contractData, setContractData] = useAtom(contractDataAtom);
   const [initialYearAdded, setInitialYearAdded] = useState(false);
-
+  const years = [
+    ...new Set(formData && formData?.milestoneAmount.map((item) => item.year)),
+  ];
+  const [selectedYear, setSelectedYear] = useState(null);
+  const [selectedYearData, setSelectedYearData] = useState(null);
+  
+  useEffect(() => {
+    const years = [
+      ...new Set(
+        formData && formData?.milestoneAmount.map((item) => item.year)
+      ),
+    ];
+   setSelectedYear(years[0]);
+  }, [formData]);
+  useEffect(() => {
+    const filteredData = formData?.milestoneAmount.filter(
+      (item) => item.year === selectedYear
+    );
+    setSelectedYearData(filteredData);
+  }, [selectedYear, formData]);
   useEffect(() => {
     if (modalType === "edit" || modalType === "view") {
       setFormData({
@@ -72,11 +98,13 @@ const ContractManagementModal = ({ showModal, onClose, modalType, modalData = {}
         milestoneAmount: modalData.milestoneAmount || [],
       });
     } else if (modalType === "add" && !initialYearAdded) {
-      addNewYear();
+      addNewRevisionData();
       setInitialYearAdded(true);
     }
   }, [modalType, modalData, initialYearAdded]);
-
+const handleTabClick = (year) => {
+    setSelectedYear(year);
+  };
   const handleChange = (e, name) => {
     const value = e.target.value;
     setFormData((prevData) => ({
@@ -91,9 +119,7 @@ const ContractManagementModal = ({ showModal, onClose, modalType, modalData = {}
   };
   const validateField = (name, value) => {
     let error = "";
-     console.log("inside name...........",name);
-     console.log("inside value..........",value);
-    if (name === "contractName") {
+   if (name === "contractName") {
       if (!value) {
         error = "Contract Name is required";
       } else if (value.length < 2) {
@@ -111,13 +137,11 @@ const ContractManagementModal = ({ showModal, onClose, modalType, modalData = {}
       if (!value) {
         error = "Reference PO is required";
       }
-    } else if(name === 'bpSubPortfolio'){
+    } else if (name === "bpSubPortfolio") {
       if (!value) {
         error = "BP sub portfolio is required";
       }
     }
-    console.log("inside name is........", name);
-    console.log("inside error........", error);
     return error;
   };
   const handleYearChange = (e, yearIndex, month) => {
@@ -129,47 +153,63 @@ const ContractManagementModal = ({ showModal, onClose, modalType, modalData = {}
     });
   };
 
-  const handleYearValueChange = (e, yearIndex) => {
+  const handleYearValueChange = (e, yearIndex, month, monthIndex) => {
     const newYear = e.target.value;
+    const monthNames = [
+      "jan",
+      "feb",
+      "mar",
+      "apr",
+      "may",
+      "jun",
+      "jul",
+      "aug",
+      "sep",
+      "oct",
+      "nov",
+      "dec",
+    ];
+    let monthKey = monthNames[monthIndex];
     setFormData((prevData) => {
       const updatedMilestoneAmount = [...prevData.milestoneAmount];
-      updatedMilestoneAmount[yearIndex].year = newYear;
+      if(updatedMilestoneAmount[yearIndex].year !== selectedYear){
+        updatedMilestoneAmount[updatedMilestoneAmount.length - 1].months[monthKey] = newYear;
+      }else{
+        updatedMilestoneAmount[yearIndex].months[monthKey] = newYear;
+      }
       return { ...prevData, milestoneAmount: updatedMilestoneAmount };
     });
   };
-  const findDuplicateYears =(arr)=>{
-    const seen = new Set();
-    const duplicates = [];
 
-    for (const obj of arr) {
-        const year = obj.year;
+  const findDuplicateYears = () => {
+    const years = [
+      ...new Set(
+        formData && formData?.milestoneAmount.map((item) => item.year)
+      ),
+    ];
+    return years;
+  };
 
-        if (seen.has(year)) {
-            duplicates.push(year); 
-        } else {
-            seen.add(year); 
-        }
-    }
-
-    return duplicates; 
-}
-
-  const addNewYear = () => {
-    const existingYears = formData.milestoneAmount.map((milestone) => milestone.year);
+  const addNewRevision = () => {
+    const existingYears = formData.milestoneAmount.map(
+      (milestone) => milestone.year
+    );
     if (existingYears.includes("")) {
       alert("Please fill in the existing year before adding a new one.");
       return;
-    } else if(findDuplicateYears(formData.milestoneAmount).length > 0){
-      alert("Duplicate years are not allow.");
-      return;
     }
+    // else if (findDuplicateYears(formData.milestoneAmount).length > 0) {
+    //   alert("Duplicate years are not allow.");
+    //   return;
+    // }
     setFormData((prevData) => ({
       ...prevData,
       milestoneAmount: [
         ...prevData.milestoneAmount,
         {
-          year: "",
-          month: {
+          revision: selectedYearData.length,
+          year: selectedYear,
+          months: {
             jan: "",
             feb: "",
             mar: "",
@@ -187,8 +227,55 @@ const ContractManagementModal = ({ showModal, onClose, modalType, modalData = {}
       ],
     }));
   };
-
-  const deleteYear = (yearIndex) => {
+  const addNewRevisionData = () => {
+    setFormData({
+      bpSubPortfolio: "",
+      contractName: "",
+      contractType: "",
+      discountPercentage: "",
+      teamType: "",
+      contractCurrency: "",
+      contractFGID: "",
+      referencePO: "",
+      PORevision: "",
+      contractProgram: "",
+      contractCSG: "",
+      revenueType: "",
+      contractStartDate: "",
+      contractEndDate: "",
+      POAmountOMS: "",
+      POAmountFG: "",
+      POAmountAriba: "",
+      masterProjectCode: "",
+      masterProjectCodePM: "",
+      masterPU: "",
+      LOENumber: "",
+      linkedDPSNumber: "",
+      infosysContractType: "",
+      totalSoWWorkers: "",
+      milestoneAmount: [
+        {
+          revision: 0,
+          year: selectedYearData?.length === 0 ? 0 : selectedYearData?.length,
+          months: {
+            jan: "",
+            feb: "",
+            mar: "",
+            apr: "",
+            may: "",
+            jun: "",
+            jul: "",
+            aug: "",
+            sep: "",
+            oct: "",
+            nov: "",
+            dec: "",
+          },
+        },
+      ],
+    });
+  };
+  const deleteRevision = (yearIndex) => {
     setFormData((prevData) => {
       const updatedMilestoneAmount = [...prevData.milestoneAmount];
       updatedMilestoneAmount.splice(yearIndex, 1);
@@ -198,10 +285,15 @@ const ContractManagementModal = ({ showModal, onClose, modalType, modalData = {}
 
   const onSaveChanges = () => {
     const cleanedMilestoneAmount = formData.milestoneAmount.filter(
-      (milestone) => milestone.year !== "" && Object.values(milestone.month).some((value) => value !== "")
+      (milestone) =>
+        milestone.year !== "" &&
+        Object.values(milestone.months).some((value) => value !== "")
     );
 
-    const updatedFormData = { ...formData, milestoneAmount: cleanedMilestoneAmount };
+    const updatedFormData = {
+      ...formData,
+      milestoneAmount: cleanedMilestoneAmount,
+    };
 
     if (modalType === "edit") {
       const updatedContractData = contractData.map((item) =>
@@ -213,34 +305,34 @@ const ContractManagementModal = ({ showModal, onClose, modalType, modalData = {}
     }
     handleCloseModal();
   };
-const resetErrorMessages=()=>{
-  setErrors({
-    bpSubPortfolio: "",
-    contractName: "",
-    contractType: "",
-    discountPercentage: "",
-    teamType: "",
-    contractCurrency: "",
-    contractFGID: "",
-    referencePO: "",
-    PORevision: "",
-    contractProgram: "",
-    contractCSG: "",
-    revenueType: "",
-    contractStartDate: "",
-    contractEndDate: "",
-    POAmountOMS: "",
-    POAmountFG: "",
-    POAmountAriba: "",
-    masterProjectCode: "",
-    masterProjectCodePM: "",
-    masterPU: "",
-    LOENumber: "",
-    linkedDPSNumber: "",
-    infosysContractType: "",
-    totalSoWWorkers: "",
-  })
-}
+  const resetErrorMessages = () => {
+    setErrors({
+      bpSubPortfolio: "",
+      contractName: "",
+      contractType: "",
+      discountPercentage: "",
+      teamType: "",
+      contractCurrency: "",
+      contractFGID: "",
+      referencePO: "",
+      PORevision: "",
+      contractProgram: "",
+      contractCSG: "",
+      revenueType: "",
+      contractStartDate: "",
+      contractEndDate: "",
+      POAmountOMS: "",
+      POAmountFG: "",
+      POAmountAriba: "",
+      masterProjectCode: "",
+      masterProjectCodePM: "",
+      masterPU: "",
+      LOENumber: "",
+      linkedDPSNumber: "",
+      infosysContractType: "",
+      totalSoWWorkers: "",
+    });
+  };
   const handleCloseModal = () => {
     setFormData({
       bpSubPortfolio: "",
@@ -294,25 +386,16 @@ const resetErrorMessages=()=>{
       fieldType: "dropdown",
     },
     { label: "Contract FGID", name: "contractFGID", fieldType: "text" },
-    { label: "Reference PO", name: "referencePO", fieldType: "text" },
     { label: "PO Revision", name: "PORevision", fieldType: "dropdown" },
-  ];
 
-  const contractsTrackerFields = [
-    {
-      label: "BP Sub Portfolio",
-      name: "bpSubPortfolio",
-      fieldType: "dropdown",
-    },
     {
       label: "Contract Program (Mission / Program)",
       name: "contractProgram",
       fieldType: "dropdown",
     },
+
     { label: "Contract CSG", name: "contractCSG", fieldType: "text" },
     { label: "Revenue Type", name: "revenueType", fieldType: "dropdown" },
-    { label: "Contract Name", name: "contractName", fieldType: "text" },
-    { label: "Contract FGID", name: "contractFGID", fieldType: "text" },
     {
       label: "Contract Start Date",
       name: "contractStartDate",
@@ -348,7 +431,17 @@ const resetErrorMessages=()=>{
     },
     { label: "Total SoW Workers", name: "totalSoWWorkers", fieldType: "text" },
   ];
-
+ 
+  const addNewRevisionYear =(e)=>{
+    setFormData((prevData) => {
+      const updatedMilestoneAmount = [{
+        revision: selectedYearData?.length <=1 ? 0 : selectedYearData?.length,
+        year: e.target.value,
+        months: {...prevData.milestoneAmount[0].months}
+      }];
+     return { ...prevData, milestoneAmount: updatedMilestoneAmount };
+    });
+  }
   return (
     <Modal
       show={showModal}
@@ -449,8 +542,111 @@ const resetErrorMessages=()=>{
                   aria-labelledby="headingThree"
                   data-bs-parent="#accordionExample"
                 >
-                  <div >
-                    {formData.milestoneAmount.map((milestone, index) => (
+                  <div>
+                    {modalType !== "view" && (
+                      <Button
+                        className="add-year-button"
+                        variant="primary"
+                        onClick={addNewRevision}
+                      >
+                        Add New Revision
+                      </Button>
+                    )}
+                    <div className="milestone-section">
+                      {modalType === "add" ? (
+                        <InputField
+                          label=""
+                          type="text"
+                          name={`month`}
+                          value={selectedYear}
+                          onChange={(e) =>
+                            addNewRevisionYear(e)
+                          }
+                          readOnly={modalType === "view"}
+                        />
+                      ) : (
+                        findDuplicateYears(formData.milestoneAmount).map(
+                          (milestone, index) => (
+                            <div
+                              key={milestone}
+                              className={`year-section ${
+                                selectedYear === milestone ? "active" : ""
+                              }`}
+                              onClick={() => handleTabClick(milestone)}
+                            >
+                              {milestone}
+                            </div>
+                          )
+                        )
+                      )}
+                    </div>
+                    <Table>
+                      <thead>
+                        <tr>
+                          <td>PO Revision</td>
+                          <td>Jan</td>
+                          <td>Feb</td>
+                          <td>Mar</td>
+                          <td>Apr</td>
+                          <td>May</td>
+                          <td>Jun</td>
+                          <td>Jul</td>
+                          <td>Aug</td>
+                          <td>Sep</td>
+                          <td>Oct</td>
+                          <td>Nov</td>
+                          <td>Dec</td>
+                          <td>Action</td>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {selectedYearData &&
+                          selectedYearData.map((month, index) => (
+                            <tr key={index}>
+                              <td>
+                                {month.revision === 0
+                                  ? "Original"
+                                  : `Revision` + month.revision}
+                              </td>
+                              <>
+                                {month?.months &&
+                                  Object.values(month?.months).map(
+                                    (mon, monIndex) => (
+                                      <td className="month-textfield">
+                                        <InputField
+                                          label=""
+                                          type="text"
+                                          name={`month-${index}`}
+                                          value={mon}
+                                          onChange={(e) =>
+                                            handleYearValueChange(
+                                              e,
+                                              index,
+                                              mon,
+                                              monIndex
+                                            )
+                                          }
+                                          readOnly={modalType === "view"}
+                                        />
+                                      </td>
+                                    )
+                                  )}
+                                {modalType !== "view" && index !== 0 && (
+                                  <button
+                                    onClick={() => deleteRevision(index)}
+                                    disabled={
+                                      formData.milestoneAmount.length === 1
+                                    }
+                                  >
+                                    Delete
+                                  </button>
+                                )}
+                              </>
+                            </tr>
+                          ))}
+                      </tbody>
+                    </Table>
+                    {/* {formData.milestoneAmount.map((milestone, index) => (
                       <div className="milestone-section" key={index}>
                         <div className="milestone-header">
                           <InputField
@@ -462,7 +658,10 @@ const resetErrorMessages=()=>{
                             readOnly={modalType === "view"}
                           />
                           {modalType !== "view" && index !== 0 && (
-                            <button onClick={() => deleteYear(index)} disabled={formData.milestoneAmount.length === 1}>
+                            <button
+                              onClick={() => deleteYear(index)}
+                              disabled={formData.milestoneAmount.length === 1}
+                            >
                               Delete
                             </button>
                           )}
@@ -475,74 +674,29 @@ const resetErrorMessages=()=>{
                                 type="text"
                                 name={`${index}-${month}`}
                                 value={milestone.month[month]}
-                                onChange={(e) => handleYearChange(e, index, month)}
+                                onChange={(e) =>
+                                  handleYearChange(e, index, month)
+                                }
                                 readOnly={modalType === "view"}
                               />
                             </div>
                           ))}
                         </div>
-                        {modalType !== "view" && index === formData.milestoneAmount.length - 1 && (
-                          <Button className="add-year-button" variant="primary" onClick={addNewYear}>
-                            Add New Year
-                          </Button>
-                        )}
+                        {modalType !== "view" &&
+                          index === formData.milestoneAmount.length - 1 && (
+                            <Button
+                              className="add-year-button"
+                              variant="primary"
+                              onClick={addNewYear}
+                            >
+                              Add New Year
+                            </Button>
+                          )}
                       </div>
-                    ))}
+                    ))} */}
                   </div>
                 </div>
               </div>
-              <div className="accordion-item">
-                <h2 className="accordion-header" id="headingTwo">
-                  <button
-                    className="accordion-button collapsed"
-                    type="button"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#collapseTwo"
-                    aria-expanded="false"
-                    aria-controls="collapseTwo"
-                  >
-                    <b>Contracts Tracker (Infosys internal)</b>
-                  </button>
-                </h2>
-                <div
-                  id="collapseTwo"
-                  className="accordion-collapse collapse"
-                  aria-labelledby="headingTwo"
-                  data-bs-parent="#accordionExample"
-                >
-                  <div className="accordion-body">
-                    {contractsTrackerFields.map((field) => (
-                      <>
-                        {field.fieldType === "text" ? (
-                          <div className="inputField" key={field.name}>
-                            <InputField
-                              label={field.label}
-                              type="text"
-                              name={field.name}
-                              value={formData[field.name]}
-                              onChange={(e) => handleChange(e, field.name)}
-                              readOnly={modalType === "view"}
-                            />
-                          </div>
-                        ) : (
-                          <div className="inputSelectField" key={field.name}>
-                            <SelectField
-                              label={field.label}
-                              value={formData[field.name]}
-                              onChange={(e) =>
-                                handleChange(e, field.name)
-                              }
-                              options={selectOptions[field.name] || []}
-                              readOnly={modalType === "view"}
-                            />
-                          </div>
-                        )}
-                      </>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
             </div>
           </div>
         </div>

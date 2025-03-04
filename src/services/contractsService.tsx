@@ -56,39 +56,50 @@ const contractData = [
     totalSoWWorkers: 4,
     milestoneAmount: [
       {
+        revision: 0,
         year: 2024,
-        month: {
-          jan: "10",
-          feb: "20",
-          mar: "30",
-          apr: "40",
-          may: "50",
-          jun: "",
-          jul: "",
-          aug: "",
-          sep: "",
-          oct: "",
-          nov: "",
-          dec: "",
-        },
-      },
-      {
-        year: 2025,
-        month: {
-          jan: "10",
-          feb: "20",
-          mar: "30",
-          apr: "40",
-          may: "50",
-          jun: "",
-          jul: "",
-          aug: "",
-          sep: "",
-          oct: "",
-          nov: "",
-          dec: "",
-        },
-      },
+        months: {
+            jan: 10,
+            feb: 20,
+            mar: 30,
+            apr: 40,
+            may: 50
+        }
+    },
+    {
+        revision: 1,
+        year: 2024,
+        months: {
+            jan: 15,
+            feb: 25,
+            mar: 35,
+            apr: 45,
+            may: 55
+        }
+    },
+    {
+      revision: 2,
+      year: 2024,
+      months: {
+          jan: 15,
+          feb: 25,
+          mar: 35,
+          apr: 45,
+          may: 55
+      }
+  },
+    {
+      revision: 0,
+      year: 2025,
+      months: {
+          jan: 15,
+          feb: 25,
+          mar: 35,
+          apr: 45,
+          may: 55,
+          jun: 10,
+      }
+  }
     ],
   },
   {
@@ -119,39 +130,39 @@ const contractData = [
     totalSoWWorkers: 4,
     milestoneAmount: [
       {
+        revision: 0,
         year: 2024,
-        month: {
-          jan: "10",
-          feb: "20",
-          mar: "30",
-          apr: "40",
-          may: "50",
-          jun: "",
-          jul: "",
-          aug: "",
-          sep: "",
-          oct: "",
-          nov: "",
-          dec: "",
-        },
-      },
-      {
-        year: 2025,
-        month: {
-          jan: "10",
-          feb: "20",
-          mar: "30",
-          apr: "40",
-          may: "50",
-          jun: "",
-          jul: "",
-          aug: "",
-          sep: "",
-          oct: "",
-          nov: "",
-          dec: "",
-        },
-      },
+        months: {
+            jan: 10,
+            feb: 20,
+            mar: 30,
+            apr: 40,
+            may: 50
+        }
+    },
+    {
+        revision: 1,
+        year: 2024,
+        months: {
+            jan: 15,
+            feb: 25,
+            mar: 35,
+            apr: 45,
+            may: 55
+        }
+    },
+    {
+      revision: 1,
+      year: 2025,
+      months: {
+          jan: 15,
+          feb: 25,
+          mar: 35,
+          apr: 45,
+          may: 55,
+          Jun: 10,
+      }
+  }
     ],
   },
 ];

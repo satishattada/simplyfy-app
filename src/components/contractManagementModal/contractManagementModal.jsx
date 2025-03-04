@@ -8,6 +8,7 @@ import { contractDataAtom } from "../../atoms/contractAtoms";
 import { nodeModuleNameResolver } from "typescript";
 import selectOptions from "../../data/dropDown";
 import Table from "react-bootstrap/Table";
+import { FaTrash } from "react-icons/fa";
 
 const ContractManagementModal = ({
   showModal,
@@ -173,9 +174,9 @@ const handleTabClick = (year) => {
     setFormData((prevData) => {
       const updatedMilestoneAmount = [...prevData.milestoneAmount];
       if(updatedMilestoneAmount[yearIndex].year !== selectedYear){
-        updatedMilestoneAmount[updatedMilestoneAmount.length - 1].months[monthKey] = newYear;
+        updatedMilestoneAmount[updatedMilestoneAmount.length - 1].month[monthKey] = newYear;
       }else{
-        updatedMilestoneAmount[yearIndex].months[monthKey] = newYear;
+        updatedMilestoneAmount[yearIndex].month[monthKey] = newYear;
       }
       return { ...prevData, milestoneAmount: updatedMilestoneAmount };
     });
@@ -209,7 +210,7 @@ const handleTabClick = (year) => {
         {
           revision: selectedYearData.length,
           year: selectedYear,
-          months: {
+          month: {
             jan: "",
             feb: "",
             mar: "",
@@ -257,7 +258,7 @@ const handleTabClick = (year) => {
         {
           revision: 0,
           year: selectedYearData?.length === 0 ? 0 : selectedYearData?.length,
-          months: {
+          month: {
             jan: "",
             feb: "",
             mar: "",
@@ -287,7 +288,7 @@ const handleTabClick = (year) => {
     const cleanedMilestoneAmount = formData.milestoneAmount.filter(
       (milestone) =>
         milestone.year !== "" &&
-        Object.values(milestone.months).some((value) => value !== "")
+        Object.values(milestone.month).some((value) => value !== "")
     );
 
     const updatedFormData = {
@@ -437,7 +438,7 @@ const handleTabClick = (year) => {
       const updatedMilestoneAmount = [{
         revision: selectedYearData?.length <=1 ? 0 : selectedYearData?.length,
         year: e.target.value,
-        months: {...prevData.milestoneAmount[0].months}
+        month: {...prevData.milestoneAmount[0].month}
       }];
      return { ...prevData, milestoneAmount: updatedMilestoneAmount };
     });
@@ -609,8 +610,8 @@ const handleTabClick = (year) => {
                                   : `Revision` + month.revision}
                               </td>
                               <>
-                                {month?.months &&
-                                  Object.values(month?.months).map(
+                                {month?.month &&
+                                  Object.values(month?.month).map(
                                     (mon, monIndex) => (
                                       <td className="month-textfield">
                                         <InputField
@@ -631,14 +632,15 @@ const handleTabClick = (year) => {
                                       </td>
                                     )
                                   )}
-                                {modalType !== "view" && index !== 0 && (
+                               {month.revision !== 0 && modalType !== "view" && (
                                   <button
                                     onClick={() => deleteRevision(index)}
+                                    className="trash-button"
                                     disabled={
                                       formData.milestoneAmount.length === 1
                                     }
                                   >
-                                    Delete
+                                    <FaTrash />
                                   </button>
                                 )}
                               </>

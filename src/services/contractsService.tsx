@@ -166,12 +166,26 @@ const contractData = [
     ],
   },
 ];
-const getContractsData = () => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(contractData);
-    }, 100);
-  });
+const getContractsData = async() => {
+  // return new Promise((resolve) => {
+  //   setTimeout(() => {
+  //     resolve(contractData);
+  //   }, 100);
+  // });
+  try {
+    const response = await fetch('http://localhost:3000/contract');
+    if (!response.ok) {
+      throw new Error(`Error: ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    console.log("response.........",data.contractData);
+    
+    return data.contractData;
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    throw error; // Propagate the error so it can be handled in the component
+  }
 };
 
 export default {

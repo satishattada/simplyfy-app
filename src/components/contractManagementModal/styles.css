@@ -94,8 +94,12 @@ flex-direction: row;
   padding: 10px;
 }
 .month-textfield{
-  width: 9%;
+  width: 8.2%;
 }
 .milestone-section .inputFieldcontainer{
   width: 10%;
+}
+.trash-button{
+  border: none;
+  margin: 10px 0px 0px 10px;
 }

@@ -10,7 +10,7 @@ import selectOptions from "../../data/dropDown";
 import bpReportingFields from "../../data/reportingField";
 import Table from "react-bootstrap/Table";
 import { FaTrash } from "react-icons/fa";
-
+import contractsService from "../../services/contractsService";
 const ContractManagementModal = ({
   showModal,
   onClose,
@@ -78,17 +78,20 @@ const ContractManagementModal = ({
   ];
   const [selectedYear, setSelectedYear] = useState(null);
   const [selectedYearData, setSelectedYearData] = useState(null);
-  
+
   useEffect(() => {
     const years = [
       ...new Set(
         formData && formData?.milestoneAmount.map((item) => item.year)
       ),
     ];
-    if(modalType === "add" || selectedYear === null || selectedYear === undefined){
+    if (
+      modalType === "add" ||
+      selectedYear === null ||
+      selectedYear === undefined
+    ) {
       setSelectedYear(years[0]);
     }
-    
   }, [formData]);
   useEffect(() => {
     const filteredData = formData?.milestoneAmount.filter(
@@ -107,7 +110,7 @@ const ContractManagementModal = ({
       setInitialYearAdded(true);
     }
   }, [modalType, modalData, initialYearAdded]);
-const handleTabClick = (year) => {
+  const handleTabClick = (year) => {
     setSelectedYear(year);
   };
   const handleChange = (e, name) => {
@@ -124,7 +127,7 @@ const handleTabClick = (year) => {
   };
   const validateField = (name, value) => {
     let error = "";
-   if (name === "contractName") {
+    if (name === "contractName") {
       if (!value) {
         error = "Contract Name is required";
       } else if (value.length < 2) {
@@ -158,7 +161,13 @@ const handleTabClick = (year) => {
     });
   };
 
-  const handleYearValueChange = (e, yearIndex, month, monthIndex) => {
+  const handleYearValueChange = (
+    e,
+    yearIndex,
+    monthVal,
+    monthIndex,
+    revision
+  ) => {
     const newYear = e.target.value;
     const monthNames = [
       "jan",
@@ -175,14 +184,33 @@ const handleTabClick = (year) => {
       "dec",
     ];
     let monthKey = monthNames[monthIndex];
-    setFormData((prevData) => {
-      const updatedMilestoneAmount = [...prevData.milestoneAmount];
-      if(updatedMilestoneAmount[yearIndex].year !== selectedYear){
-        updatedMilestoneAmount[updatedMilestoneAmount.length - 1].month[monthKey] = newYear;
-      }else{
-        updatedMilestoneAmount[yearIndex].month[monthKey] = newYear;
+    const updatedData = formData.milestoneAmount.map((item, index) => {
+      if (item.year === selectedYear && item.revision === revision) {
+       return {
+          ...item,
+          month: {
+            ...item.month,
+            [monthKey]: newYear, // Store the new data
+          },
+        };
       }
-      return { ...prevData, milestoneAmount: updatedMilestoneAmount };
+      return item;
+    });
+    handleMonthValueChange(updatedData);
+  };
+
+  const handleMonthValueChange = (updatedData) => {
+     setFormData((prevData) => {
+      // const updatedMilestoneAmount = [...prevData.milestoneAmount];
+      // console.log(updatedMilestoneAmount);
+
+      // console.log("inside yearIndex.........",yearIndex);
+      // if(updatedMilestoneAmount[yearIndex].year !== selectedYear){
+      //   updatedMilestoneAmount[updatedMilestoneAmount.length - 1].month[monthKey] = newYear;
+      // }else{
+      //   updatedMilestoneAmount[yearIndex].month[monthKey] = newYear;
+      // }
+      return { ...prevData, milestoneAmount: updatedData };
     });
   };
 
@@ -308,8 +336,35 @@ const handleTabClick = (year) => {
     } else {
       setContractData([...contractData, updatedFormData]);
     }
-    handleCloseModal();
+    if(modalType === "add"){
+      addNewContract();
+    }else if(modalType === "edit"){
+      updateEditedContract();
+    }
+   
   };
+  const updateEditedContract = () => {
+    contractsService
+    .updateEditedContract(formData)
+    .then((resp) => {
+      console.log(resp);
+      handleCloseModal();
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  }
+  const addNewContract = () => {
+    contractsService
+    .addContract(formData)
+    .then((resp) => {
+      console.log(resp);
+      handleCloseModal();
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  }
   const resetErrorMessages = () => {
     setErrors({
       bpSubPortfolio: "",
@@ -371,16 +426,19 @@ const handleTabClick = (year) => {
     onClose();
   };
 
-   const addNewRevisionYear =(e)=>{
+  const addNewRevisionYear = (e) => {
     setFormData((prevData) => {
-      const updatedMilestoneAmount = [{
-        revision: selectedYearData?.length <=1 ? 0 : selectedYearData?.length,
-        year: e.target.value,
-        month: {...prevData.milestoneAmount[0].month}
-      }];
-     return { ...prevData, milestoneAmount: updatedMilestoneAmount };
+      const updatedMilestoneAmount = [
+        {
+          revision:
+            selectedYearData?.length <= 1 ? 0 : selectedYearData?.length,
+          year: parseInt(e.target.value),
+          month: { ...prevData.milestoneAmount[0].month },
+        },
+      ];
+      return { ...prevData, milestoneAmount: updatedMilestoneAmount };
     });
-  }
+  };
   return (
     <Modal
       show={showModal}
@@ -498,9 +556,7 @@ const handleTabClick = (year) => {
                           type="text"
                           name={`month`}
                           value={selectedYear}
-                          onChange={(e) =>
-                            addNewRevisionYear(e)
-                          }
+                          onChange={(e) => addNewRevisionYear(e)}
                           readOnly={modalType === "view"}
                         />
                       ) : (
@@ -562,7 +618,8 @@ const handleTabClick = (year) => {
                                               e,
                                               index,
                                               mon,
-                                              monIndex
+                                              monIndex,
+                                              month.revision
                                             )
                                           }
                                           readOnly={modalType === "view"}
@@ -570,17 +627,18 @@ const handleTabClick = (year) => {
                                       </td>
                                     )
                                   )}
-                               {month.revision !== 0 && modalType !== "view" && (
-                                  <button
-                                    onClick={() => deleteRevision(index)}
-                                    className="trash-button"
-                                    disabled={
-                                      formData.milestoneAmount.length === 1
-                                    }
-                                  >
-                                    <FaTrash />
-                                  </button>
-                                )}
+                                {month.revision !== 0 &&
+                                  modalType !== "view" && (
+                                    <button
+                                      onClick={() => deleteRevision(index)}
+                                      className="trash-button"
+                                      disabled={
+                                        formData.milestoneAmount.length === 1
+                                      }
+                                    >
+                                      <FaTrash />
+                                    </button>
+                                  )}
                               </>
                             </tr>
                           ))}

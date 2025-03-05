@@ -33,7 +33,7 @@ function DemandView() {
   const [modalType, setModalType] = useState<string>("add");
   const [modalData, setModalData] = useState<object>({});
   const [currentPage, setCurrentPage] = useState(1);
-  const [contractData, setTeamData] = useAtom(contractDataAtom);
+  const [contractData, setContractData] = useAtom(contractDataAtom);
   const handleSearchChange = (query: string) => {
     setQuery(query);
   };
@@ -43,7 +43,7 @@ function DemandView() {
       .getContractsData()
       .then((resp) => {
         const reponse = resp as ContractReq[];
-        setTeamData(reponse);
+        setContractData(reponse);
         setTotalItems(reponse.length);
       }) //set item count
       .catch((err) => {
@@ -62,11 +62,11 @@ function DemandView() {
       setFilteredData(currentItems); // Show all data if the search query is empty
     } else {
       // Filter data based on the query
-      const filtered =
+        const filtered =
         contractData &&
         contractData?.filter(
           (item: any) =>
-            item.id.toString().includes(query) ||
+           // item.id.toString().includes(query) ||
             item.contractName?.toLowerCase().includes(query?.toLowerCase()) ||
             item.bpSubPortfolio?.toLowerCase().includes(query?.toLowerCase()) ||
             item.contractType?.toLowerCase().includes(query?.toLowerCase()) ||
@@ -122,7 +122,7 @@ function DemandView() {
           const newData = jsonData.filter((newItem: any) => 
             !contractData.some((existingItem) => existingItem.id === newItem.id)
         );
-        setTeamData((prevData) => [...prevData, ...(newData as ContractReq[])]);
+        setContractData((prevData) => [...prevData, ...(newData as ContractReq[])]);
       }
     };
     reader.readAsArrayBuffer(file);

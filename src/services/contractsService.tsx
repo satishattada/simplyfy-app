@@ -166,28 +166,60 @@ const contractData = [
     ],
   },
 ];
+const apiURL = 'http://localhost:3000/contract';
 const getContractsData = async() => {
-  // return new Promise((resolve) => {
-  //   setTimeout(() => {
-  //     resolve(contractData);
-  //   }, 100);
-  // });
   try {
-    const response = await fetch('http://localhost:3000/contract');
+    const response = await fetch(apiURL);
     if (!response.ok) {
       throw new Error(`Error: ${response.statusText}`);
     }
     
     const data = await response.json();
-    console.log("response.........",data.contractData);
-    
     return data.contractData;
   } catch (error) {
     console.error('Error fetching data:', error);
-    throw error; // Propagate the error so it can be handled in the component
+    throw error; 
   }
 };
-
+const updateEditedContract = async (contract: contractReq) => {
+  try {
+    const response = await fetch(`${apiURL}/${contract.contractFGID}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(contract),
+    });
+    if (!response.ok) {
+      throw new Error(`Error: ${response.statusText}`);
+    }
+    return response.json();
+  } catch (error) {
+    console.error('Error updating contract:', error);
+    throw error;
+  }
+}
+const addContract = async (contract: contractReq) => {
+  console.log("inside contract.........",apiURL);
+  try {
+    const response = await fetch(apiURL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(contract),
+    });
+    if (!response.ok) {
+      throw new Error(`Error: ${response.statusText}`);
+    }
+    return response.json();
+  } catch (error) {
+    console.error('Error adding contract:', error);
+    throw error;
+  }
+}
 export default {
   getContractsData,
+  updateEditedContract,
+  addContract,
 };

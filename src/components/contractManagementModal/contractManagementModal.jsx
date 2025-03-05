@@ -11,11 +11,13 @@ import bpReportingFields from "../../data/reportingField";
 import Table from "react-bootstrap/Table";
 import { FaTrash } from "react-icons/fa";
 import contractsService from "../../services/contractsService";
+import { FaCalendarAlt } from "react-icons/fa";
 const ContractManagementModal = ({
   showModal,
   onClose,
   modalType,
   modalData = {},
+  onFetchData,
 }) => {
   const [selectedRevision, setSelectedRevision] = useState(null);
   const [formData, setFormData] = useState({
@@ -71,6 +73,7 @@ const ContractManagementModal = ({
     infosysContractType: "",
     totalSoWWorkers: "",
   });
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const [contractData, setContractData] = useAtom(contractDataAtom);
   const [initialYearAdded, setInitialYearAdded] = useState(false);
   const years = [
@@ -424,6 +427,9 @@ const ContractManagementModal = ({
     setInitialYearAdded(false);
     resetErrorMessages();
     onClose();
+    if(modalType === "edit" || modalType === "add"){
+      onFetchData();
+    }
   };
 
   const addNewRevisionYear = (e) => {
@@ -551,14 +557,39 @@ const ContractManagementModal = ({
                     )}
                     <div className="milestone-section">
                       {modalType === "add" ? (
-                        <InputField
-                          label=""
-                          type="text"
-                          name={`month`}
-                          value={selectedYear}
-                          onChange={(e) => addNewRevisionYear(e)}
-                          readOnly={modalType === "view"}
-                        />
+                        <>
+                          <InputField
+                            label=""
+                            type="text"
+                            name={`month`}
+                            value={selectedYear}
+                            onChange={(e) => addNewRevisionYear(e)}
+                            
+                            readOnly={modalType === "view"}
+                          />
+                          {/* <FaCalendarAlt
+                            size={50}
+                            color="blue"
+                            onClick={toggleDatePicker} // Toggle the date picker on click
+                            style={{ cursor: "pointer" }}
+                          />
+                          {showDatePicker && (
+                            <div
+                              style={{
+                                position: "absolute",
+                                zIndex: "1",
+                                top: "60px",
+                                left: "0",
+                              }}
+                            >
+                              <DatePicker
+                                selected={startDate}
+                                onChange={(date) => setStartDate(date)} // Set the selected date
+                                inline // Display inline
+                              />
+                            </div>
+                          )} */}
+                        </>
                       ) : (
                         findDuplicateYears(formData.milestoneAmount).map(
                           (milestone, index) => (

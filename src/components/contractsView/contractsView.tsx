@@ -39,16 +39,7 @@ function DemandView() {
   };
 
   useEffect(() => {
-    contractsService
-      .getContractsData()
-      .then((resp) => {
-        const reponse = resp as ContractReq[];
-        setContractData(reponse);
-        setTotalItems(reponse.length);
-      }) //set item count
-      .catch((err) => {
-        console.log(err);
-      });
+    handleFetchData();
   }, []);
   useEffect(() => {
     if (query === "" || query === undefined) {
@@ -108,6 +99,18 @@ function DemandView() {
     setShowModal(false);
     setModalData({});
   };
+  const handleFetchData = () => {
+    contractsService
+      .getContractsData()
+      .then((resp) => {
+        const reponse = resp as ContractReq[];
+        setContractData(reponse);
+        setTotalItems(reponse.length);
+      }) //set item count
+      .catch((err) => {
+        console.log(err);
+      });
+  }
     const handleBulkUpload = (event:any) => {
       const file = event.target.files[0];
       const reader = new FileReader();
@@ -162,6 +165,7 @@ function DemandView() {
      onClose={() => handleCloseModel()}
      modalType={modalType}
      modalData={modalType === "edit" || modalType === "view"  ? modalData : undefined}
+     onFetchData={() => handleFetchData()}
     />
     <div className="d-flex justify-content-between mt-5 mb-4">
       <SearchComponent onSearch={handleSearchChange} />

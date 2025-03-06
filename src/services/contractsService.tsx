@@ -166,7 +166,7 @@ const contractData = [
     ],
   },
 ];
-const apiURL = 'http://localhost:3000/contract';
+const apiURL = 'https://operations-backend-production-5877.up.railway.app/contract';
 const getContractsData = async() => {
   try {
     const response = await fetch(apiURL);

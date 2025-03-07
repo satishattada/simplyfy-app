@@ -34,6 +34,7 @@ function DemandView() {
   const [modalType, setModalType] = useState<string>("add");
   const [modalData, setModalData] = useState<object>({});
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [contractData, setContractData] = useAtom(contractDataAtom);
   const handleSearchChange = (query: string) => {
     setQuery(query);
@@ -52,6 +53,7 @@ function DemandView() {
         startIndex + itemsPerPage
       );
       setFilteredData(currentItems); // Show all data if the search query is empty
+      setTotalPages(Math.ceil(contractData.length / itemsPerPage));
     } else {
       // Filter data based on the query
         const filtered =
@@ -76,6 +78,7 @@ function DemandView() {
         startIndex + itemsPerPage
       );
       setFilteredData(currentItems);
+      setTotalPages(Math.ceil(filtered.length / itemsPerPage));
     }
   }, [contractData, query, currentPage]);
   const handleModal = (type: string, request?: any) => {
@@ -107,6 +110,7 @@ function DemandView() {
         const reponse = resp as ContractReq[];
         setContractData(reponse);
         setTotalItems(reponse.length);
+        setTotalPages(Math.ceil(reponse.length / itemsPerPage));
       }) //set item count
       .catch((err) => {
         console.log(err);
@@ -158,7 +162,7 @@ const handleBulkUpload = async (event: any) => {
   // };
   // reader.readAsArrayBuffer(file);
 };
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
+ 
   const downloadExcel = () => {
     const flattenedData = contractData.flatMap(item => {
       return item.milestoneAmount.map((yearData: any) => {

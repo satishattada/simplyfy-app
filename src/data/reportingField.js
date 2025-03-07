@@ -18,7 +18,7 @@ const bpReportingFields = [
       fieldType: "dropdown",
     },
     { label: "Contract FGID", name: "contractFGID", fieldType: "text" },
-    { label: "PO Revision", name: "PORevision", fieldType: "dropdown" },
+    // { label: "PO Revision", name: "PORevision", fieldType: "dropdown" },
 
     {
       label: "Contract Program (Mission / Program)",

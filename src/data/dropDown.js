@@ -31,12 +31,12 @@ const selectOptions = {
       { value: 'GBP', label: 'GBP' },
       { value: 'EUR', label: 'EUR' }
     ] ,
-    PORevision: [
-      { value: '', label: 'Select a PO Revision' },
-      { value: 'Original', label: 'Original' },
-      { value: 'Rev1', label: 'Rev1' },
-      { value: 'Rev2', label: 'Rev2' },
-    ],
+    // PORevision: [
+    //   { value: '', label: 'Select a PO Revision' },
+    //   { value: 'Original', label: 'Original' },
+    //   { value: 'Rev1', label: 'Rev1' },
+    //   { value: 'Rev2', label: 'Rev2' },
+    // ],
     revenueType: [
       { value: '', label: 'Select a Revenue Type' },
       { value: 'Capex', label: 'Capex' },

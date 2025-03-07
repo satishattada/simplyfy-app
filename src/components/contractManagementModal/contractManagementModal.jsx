@@ -119,14 +119,15 @@ const ContractManagementModal = ({
   const setSelectedDateForStartDate = (date,name) => {
     const dt = date.split("-")[2];
     if(name === "contractStartDate" && dt?.length === 2){
-      setSelectedYear(dt);
+      let tempDt = '20'+dt;
+      setSelectedYear(tempDt);
       setFormData((prevData) => ({
         ...prevData,
         milestoneAmount: [
           ...prevData.milestoneAmount,
           {
             revision: 0,
-            year: dt,
+            year: tempDt,
             month: {
               jan: "",
               feb: "",
@@ -153,7 +154,7 @@ const ContractManagementModal = ({
         ...prevData.milestoneAmount,
         {
           revision: 0,
-          year: dt,
+          year: '20'+dt,
           month: {
             jan: "",
             feb: "",
@@ -302,10 +303,6 @@ const ContractManagementModal = ({
       alert("Please fill in the existing year before adding a new one.");
       return;
     }
-    // else if (findDuplicateYears(formData.milestoneAmount).length > 0) {
-    //   alert("Duplicate years are not allow.");
-    //   return;
-    // }
     setFormData((prevData) => ({
       ...prevData,
       milestoneAmount: [
@@ -379,11 +376,11 @@ const ContractManagementModal = ({
       ],
     });
   };
-  const deleteRevision = (yearIndex) => {
+  const deleteRevision = (yearIndex,revision) => {
     setFormData((prevData) => {
       const updatedMilestoneAmount = [...prevData.milestoneAmount];
-      updatedMilestoneAmount.splice(yearIndex, 1);
-      return { ...prevData, milestoneAmount: updatedMilestoneAmount };
+     const filterData = updatedMilestoneAmount.filter(item => !(item.revision === revision && item.year === selectedYear));
+      return { ...prevData, milestoneAmount: filterData };
     });
   };
 
@@ -515,8 +512,10 @@ const ContractManagementModal = ({
     });
   };
   const validateStartAndEndDate = () => {
-    if((selectedYear === 0 || selectedYear === undefined) && formData.contractStartDate === ""){
-      alert("Please fill the contract start date first.");
+    console.log("selectedYear........",selectedYear);
+    console.log("formData.contractStartDate........",formData.contractStartDate);
+    if((!selectedYear) && formData.contractStartDate === ""){
+      alert("Please fill the contract start date and end date first.");
       return
     }
   }
@@ -592,6 +591,7 @@ const ContractManagementModal = ({
                               marginLeft: "13px",
                               display: "block",
                             }}
+                            key={field.name}  
                           >
                             {errors[field.name]}
                           </span>
@@ -638,7 +638,7 @@ const ContractManagementModal = ({
                           (milestone, index) => (
                            
                             <div
-                              key={milestone}
+                              key={index}
                               className={`year-section ${
                                 selectedYear === milestone ? "active" : ""
                               }`}
@@ -707,7 +707,7 @@ const ContractManagementModal = ({
                                 {month.revision !== 0 &&
                                   modalType !== "view" && (
                                     <button
-                                      onClick={() => deleteRevision(index)}
+                                      onClick={() => deleteRevision(index, month.revision)}
                                       className="trash-button"
                                       disabled={
                                         formData.milestoneAmount.length === 1
@@ -721,54 +721,6 @@ const ContractManagementModal = ({
                           ))}
                       </tbody>
                     </Table>
-                    {/* {formData.milestoneAmount.map((milestone, index) => (
-                      <div className="milestone-section" key={index}>
-                        <div className="milestone-header">
-                          <InputField
-                            label="Year"
-                            type="text"
-                            name={`year-${index}`}
-                            value={milestone.year}
-                            onChange={(e) => handleYearValueChange(e, index)}
-                            readOnly={modalType === "view"}
-                          />
-                          {modalType !== "view" && index !== 0 && (
-                            <button
-                              onClick={() => deleteYear(index)}
-                              disabled={formData.milestoneAmount.length === 1}
-                            >
-                              Delete
-                            </button>
-                          )}
-                        </div>
-                        <div className="milestone-months">
-                          {Object.keys(milestone.month).map((month) => (
-                            <div className="milestone-month" key={month}>
-                              <InputField
-                                label={month}
-                                type="text"
-                                name={`${index}-${month}`}
-                                value={milestone.month[month]}
-                                onChange={(e) =>
-                                  handleYearChange(e, index, month)
-                                }
-                                readOnly={modalType === "view"}
-                              />
-                            </div>
-                          ))}
-                        </div>
-                        {modalType !== "view" &&
-                          index === formData.milestoneAmount.length - 1 && (
-                            <Button
-                              className="add-year-button"
-                              variant="primary"
-                              onClick={addNewYear}
-                            >
-                              Add New Year
-                            </Button>
-                          )}
-                      </div>
-                    ))} */}
                   </div>
                 </div>
               </div>

@@ -11,6 +11,7 @@ import { useAtom } from "jotai";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import ContractManagementModal from "../contractManagementModal/contractManagementModal";
+import transformContractData from "../../helper/helper";
 interface Request {
   id: string;
   dateRequested: string;
@@ -23,7 +24,7 @@ interface Request {
   status: string;
 }
 function DemandView() {
-  const itemsPerPage = 5;
+  const itemsPerPage = 10;
   const [query, setQuery] = useState<string>("");
   const [totalItems, setTotalItems] = useState(0);
   const [filteredData, setFilteredData] = useState<ContractReq[] | undefined>(
@@ -63,7 +64,7 @@ function DemandView() {
             item.contractType?.toLowerCase().includes(query?.toLowerCase()) ||
             item.teamType?.toLowerCase().includes(query?.toLowerCase()) ||
             item.referencePO?.toString().includes(query?.toLowerCase()) ||
-            item.PORevision?.toLowerCase().includes(query?.toLowerCase()) ||
+            // item.PORevision?.toLowerCase().includes(query?.toLowerCase()) ||
             item.contractCurrency?.toLowerCase().includes(query?.toLowerCase()) ||
             item.contractFGID?.toLowerCase().includes(query?.toLowerCase()) ||
             item.revenueType?.toLowerCase().includes(query?.toLowerCase())
@@ -111,25 +112,52 @@ function DemandView() {
         console.log(err);
       });
   }
-    const handleBulkUpload = (event:any) => {
-      const file = event.target.files[0];
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        if (e.target && e.target.result) {
-          const data = new Uint8Array(e.target.result as ArrayBuffer);
-          const workbook = XLSX.read(data, { type: "array" });
-          const sheetName = workbook.SheetNames[0];
-          const worksheet = workbook.Sheets[sheetName];
-          const jsonData = XLSX.utils.sheet_to_json(worksheet);
-          console.log(jsonData);
-          const newData = jsonData.filter((newItem: any) => 
-            !contractData.some((existingItem) => existingItem.id === newItem.id)
-        );
-        setContractData((prevData) => [...prevData, ...(newData as ContractReq[])]);
-      }
-    };
-    reader.readAsArrayBuffer(file);
-  };
+
+
+
+const handleBulkUpload = async (event: any) => {
+  alert(`Bulk Upload under developement ...`);
+  // const file = event.target.files[0];
+  // const reader = new FileReader();
+  // reader.onload = async (e) => {
+  //   if (e.target && e.target.result) {
+  //     const data = new Uint8Array(e.target.result as ArrayBuffer);
+  //     const workbook = XLSX.read(data, { type: "array", cellDates: true });
+  //     const sheetName = workbook.SheetNames[0];
+  //     const worksheet = workbook.Sheets[sheetName];
+  //     const jsonData = XLSX.utils.sheet_to_json(worksheet, { raw: false, dateNF: 'dd-mmm-yy' });
+  //     const transformedData = transformContractData(jsonData);
+  //     console.log(transformedData);
+
+  //     try {
+  //       const response = await fetch('https://operations-backend-production-5877.up.railway.app/contract/bulk', {
+  //         method: 'POST',
+  //         headers: {
+  //           'Content-Type': 'application/json',
+  //         },
+  //         body: JSON.stringify(transformedData),
+  //       });
+
+  //       if (!response.ok) {
+  //         const errorData = await response.json();
+  //         throw new Error(`Error: ${response.statusText} - ${errorData.message.join(', ')}`);
+  //       }
+
+  //       const result = await response.json();
+  //       alert('Bulk upload successful!');
+  //       handleFetchData(); // Fetch the updated data
+  //     } catch (error) {
+  //       console.error('Error uploading bulk data:', error);
+  //       if (error instanceof Error) {
+  //         alert(`Bulk upload failed: ${error.message}`);
+  //       } else {
+  //         alert('Bulk upload failed: An unknown error occurred.');
+  //       }
+  //     }
+  //   }
+  // };
+  // reader.readAsArrayBuffer(file);
+};
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   const downloadExcel = () => {
     const flattenedData = contractData.flatMap(item => {
@@ -174,16 +202,16 @@ function DemandView() {
                   className="bi bi-plus-circle edit-btn mx-2"
                   onClick={() => handleModal("add",{})}
                 ></i>
-                  <i className="bi bi-filetype-csv export-btn mx-2" onClick={downloadExcel}></i>
-                <input
+                  <i className="bi bi-download edit-btn mx-2" onClick={downloadExcel}></i>
+                {/* <input
                   type="file"
                   accept=".xlsx, .xls"
                   onChange={handleBulkUpload}
                   style={{ display: "none" }}
                   id="bulkUpload"
-                />
+                /> */}
                 <label htmlFor="bulkUpload" className="mx-2">
-                  <i className="bi bi-upload edit-btn"></i>
+                  <i className="bi bi-upload edit-btn" onClick={handleBulkUpload}></i>
                 </label>
               </div>
       </div>  
@@ -197,7 +225,7 @@ function DemandView() {
             <td>Contract Type</td>
             <td>Team Type</td>
             <td>Reference PO</td>
-            <td>PO Revision</td>
+            {/* <td>PO Revision</td> */}
             <td>Contract Currency</td>
             <td>Revenue Type</td>
             <td>Action</td>
@@ -222,7 +250,7 @@ function DemandView() {
                 <td>{request.contractType}</td>
                 <td>{request.teamType}</td>
                 <td>{request.referencePO}</td>
-                <td>{request.PORevision}</td>
+                {/* <td>{request.PORevision}</td> */}
                 <td>{request.contractCurrency}</td>
                 <td>{request.revenueType}</td>
                 <td>

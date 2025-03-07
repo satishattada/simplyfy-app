@@ -631,7 +631,6 @@ const ContractManagementModal = ({
                         Add New Revision
                       </Button>
                     )}
-                    {selectedYear}
                      {selectedYear !== undefined && (
                     <div className="milestone-section">
                        

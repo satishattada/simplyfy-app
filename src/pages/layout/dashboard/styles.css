@@ -17,4 +17,7 @@
 }
 .card-img-top{
   height: 75%;
+}.card.disabled {
+  pointer-events: none;
+  opacity: 0.5;
 }

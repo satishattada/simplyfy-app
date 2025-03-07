@@ -85,19 +85,19 @@ const ContractManagementModal = ({
   useEffect(() => {
     const years = [
       ...new Set(
-        formData && formData?.milestoneAmount.map((item) => item.year)
+        formData?.milestoneAmount
+          .filter((item) => item.year != null && item.year !== '') // Filter out null and empty string
+          .map((item) => item.year)
       ),
     ];
-    if (
-      modalType === "add" ||
-      selectedYear === null ||
-      selectedYear === undefined
+    if ((modalType !== "add") && (selectedYear === null ||
+        selectedYear === undefined)
     ) {
       setSelectedYear(years[0]);
-    }
+    } 
   }, [formData]);
   useEffect(() => {
-    const filteredData = formData?.milestoneAmount.filter(
+    const filteredData = formData?.milestoneAmount && formData?.milestoneAmount.filter(
       (item) => item.year === selectedYear
     );
     setSelectedYearData(filteredData);
@@ -116,6 +116,64 @@ const ContractManagementModal = ({
   const handleTabClick = (year) => {
     setSelectedYear(year);
   };
+  const setSelectedDateForStartDate = (date,name) => {
+    const dt = date.split("-")[2];
+    if(name === "contractStartDate" && dt?.length === 2){
+      setSelectedYear(dt);
+      setFormData((prevData) => ({
+        ...prevData,
+        milestoneAmount: [
+          ...prevData.milestoneAmount,
+          {
+            revision: 0,
+            year: dt,
+            month: {
+              jan: "",
+              feb: "",
+              mar: "",
+              apr: "",
+              may: "",
+              jun: "",
+              jul: "",
+              aug: "",
+              sep: "",
+              oct: "",
+              nov: "",
+              dec: "",
+            },
+          },
+        ],
+      }));
+    }
+   else if(name === "contractEndDate" && dt?.length === 2){
+   
+    setFormData((prevData) => ({
+      ...prevData,
+      milestoneAmount: [
+        ...prevData.milestoneAmount,
+        {
+          revision: 0,
+          year: dt,
+          month: {
+            jan: "",
+            feb: "",
+            mar: "",
+            apr: "",
+            may: "",
+            jun: "",
+            jul: "",
+            aug: "",
+            sep: "",
+            oct: "",
+            nov: "",
+            dec: "",
+          },
+        },
+      ],
+    }));
+  }
+  };
+    
   const handleChange = (e, name) => {
     const value = e.target.value;
     setFormData((prevData) => ({
@@ -127,6 +185,9 @@ const ContractManagementModal = ({
       ...errors,
       [name]: error,
     });
+    if(name === "contractStartDate" || name === "contractEndDate"){
+      setSelectedDateForStartDate(value,name);
+    }
   };
   const validateField = (name, value) => {
     let error = "";
@@ -218,9 +279,16 @@ const ContractManagementModal = ({
   };
 
   const findDuplicateYears = () => {
+    // const years = [
+    //   ...new Set(
+    //     formData && formData?.milestoneAmount.map((item) => item.year)
+    //   ),
+    // ];
     const years = [
       ...new Set(
-        formData && formData?.milestoneAmount.map((item) => item.year)
+        formData?.milestoneAmount
+          .filter((item) => item.year != null && item.year !== '') // Filter out null and empty string
+          .map((item) => item.year)
       ),
     ];
     return years;
@@ -292,7 +360,7 @@ const ContractManagementModal = ({
       milestoneAmount: [
         {
           revision: 0,
-          year: selectedYearData?.length === 0 ? 0 : selectedYearData?.length,
+          year: "",
           month: {
             jan: "",
             feb: "",
@@ -397,6 +465,7 @@ const ContractManagementModal = ({
     });
   };
   const handleCloseModal = () => {
+    setSelectedYear(null);
     setFormData({
       bpSubPortfolio: "",
       contractName: "",
@@ -445,6 +514,12 @@ const ContractManagementModal = ({
       return { ...prevData, milestoneAmount: updatedMilestoneAmount };
     });
   };
+  const validateStartAndEndDate = () => {
+    if((selectedYear === 0 || selectedYear === undefined) && formData.contractStartDate === ""){
+      alert("Please fill the contract start date first.");
+      return
+    }
+  }
   return (
     <Modal
       show={showModal}
@@ -535,6 +610,7 @@ const ContractManagementModal = ({
                     data-bs-target="#collapseThree"
                     aria-expanded="false"
                     aria-controls="collapseThree"
+                    onClick={validateStartAndEndDate}
                   >
                     <b>Milestone Amount</b>
                   </button>
@@ -555,44 +631,13 @@ const ContractManagementModal = ({
                         Add New Revision
                       </Button>
                     )}
+                    {selectedYear}
+                     {selectedYear !== undefined && (
                     <div className="milestone-section">
-                      {modalType === "add" ? (
-                        <>
-                          <InputField
-                            label=""
-                            type="text"
-                            name={`month`}
-                            value={selectedYear}
-                            onChange={(e) => addNewRevisionYear(e)}
-                            
-                            readOnly={modalType === "view"}
-                          />
-                          {/* <FaCalendarAlt
-                            size={50}
-                            color="blue"
-                            onClick={toggleDatePicker} // Toggle the date picker on click
-                            style={{ cursor: "pointer" }}
-                          />
-                          {showDatePicker && (
-                            <div
-                              style={{
-                                position: "absolute",
-                                zIndex: "1",
-                                top: "60px",
-                                left: "0",
-                              }}
-                            >
-                              <DatePicker
-                                selected={startDate}
-                                onChange={(date) => setStartDate(date)} // Set the selected date
-                                inline // Display inline
-                              />
-                            </div>
-                          )} */}
-                        </>
-                      ) : (
-                        findDuplicateYears(formData.milestoneAmount).map(
+                       
+                        {formData?.milestoneAmount && findDuplicateYears(formData.milestoneAmount).map(
                           (milestone, index) => (
+                           
                             <div
                               key={milestone}
                               className={`year-section ${
@@ -602,10 +647,12 @@ const ContractManagementModal = ({
                             >
                               {milestone}
                             </div>
+                            
                           )
-                        )
-                      )}
+                        )}
+                      
                     </div>
+                  )}
                     <Table>
                       <thead>
                         <tr>

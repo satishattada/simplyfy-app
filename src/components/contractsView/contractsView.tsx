@@ -137,6 +137,7 @@ function DemandView() {
         return {
           ...item,
           year: yearData.year,
+          revision: yearData.revision,
           ...yearData.month,
         };
       });

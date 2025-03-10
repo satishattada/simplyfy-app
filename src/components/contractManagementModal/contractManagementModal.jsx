@@ -73,7 +73,6 @@ const ContractManagementModal = ({
     infosysContractType: "",
     totalSoWWorkers: "",
   });
-  const [showDatePicker, setShowDatePicker] = useState(false);
   const [contractData, setContractData] = useAtom(contractDataAtom);
   const [initialYearAdded, setInitialYearAdded] = useState(false);
   const years = [
@@ -100,7 +99,15 @@ const ContractManagementModal = ({
     const filteredData = formData?.milestoneAmount && formData?.milestoneAmount.filter(
       (item) => item.year === selectedYear
     );
+    const revisions = [
+      ...new Set(
+        formData?.milestoneAmount
+          .filter((item) => item.revision != null && item.revision !== '') // Filter out null and empty string
+          .map((item) => item.revision)
+      ),
+    ];
     setSelectedYearData(filteredData);
+    setSelectedRevision(revisions);
   }, [selectedYear, formData]);
   useEffect(() => {
     if (modalType === "edit" || modalType === "view") {
@@ -214,9 +221,28 @@ const ContractManagementModal = ({
       if (!value) {
         error = "BP sub portfolio is required";
       }
+    } else if(name === "contractCurrency"){
+      if(!value){
+        error = "Contract currency is required";
+      } 
+    }else if(name === "contractFGID"){
+      if(!value){
+        error = "Contract FGID is required";
+      }
     }
     return error;
   };
+  const validateDisabledFields = (name, value) => {
+    if(name === "contractCurrency" && selectedRevision?.length > 1 && value !== ""){
+       return true;
+    } 
+    if(name === "contractFGID" && value !== ""){
+      return true;
+   } 
+    // else if(name === "contractStartDate" && selectedRevision?.length === 1 && value !== ""){
+    //   return true;
+    // }
+  }
   const handleYearChange = (e, yearIndex, month) => {
     const value = e.target.value;
     setFormData((prevData) => {
@@ -280,15 +306,10 @@ const ContractManagementModal = ({
   };
 
   const findDuplicateYears = () => {
-    // const years = [
-    //   ...new Set(
-    //     formData && formData?.milestoneAmount.map((item) => item.year)
-    //   ),
-    // ];
-    const years = [
+     const years = [
       ...new Set(
         formData?.milestoneAmount
-          .filter((item) => item.year != null && item.year !== '') // Filter out null and empty string
+          .filter((item) => item.year != null && item.year !== '')
           .map((item) => item.year)
       ),
     ];
@@ -396,14 +417,14 @@ const ContractManagementModal = ({
       milestoneAmount: cleanedMilestoneAmount,
     };
 
-    if (modalType === "edit") {
-      const updatedContractData = contractData.map((item) =>
-        item.id === updatedFormData.id ? updatedFormData : item
-      );
-      setContractData(updatedContractData);
-    } else {
-      setContractData([...contractData, updatedFormData]);
-    }
+    // if (modalType === "edit") {
+    //   const updatedContractData = contractData.map((item) =>
+    //     item.id === updatedFormData.id ? updatedFormData : item
+    //   );
+    //   setContractData(updatedContractData);
+    // } else {
+    //   setContractData([...contractData, updatedFormData]);
+    // }
     if(modalType === "add"){
       addNewContract();
     }else if(modalType === "edit"){
@@ -512,8 +533,6 @@ const ContractManagementModal = ({
     });
   };
   const validateStartAndEndDate = () => {
-    console.log("selectedYear........",selectedYear);
-    console.log("formData.contractStartDate........",formData.contractStartDate);
     if((!selectedYear) && formData.contractStartDate === ""){
       alert("Please fill the contract start date and end date first.");
       return
@@ -570,7 +589,7 @@ const ContractManagementModal = ({
                               name={field.name}
                               value={formData[field.name]}
                               onChange={(e) => handleChange(e, field.name)}
-                              readOnly={modalType === "view"}
+                              readOnly={modalType === "view" || validateDisabledFields(field.name,formData[field.name])}
                             />
                           </div>
                         ) : (
@@ -580,7 +599,7 @@ const ContractManagementModal = ({
                               value={formData[field.name]}
                               onChange={(e) => handleChange(e, field.name)}
                               options={selectOptions[field.name] || []}
-                              readOnly={modalType === "view"}
+                              readOnly={modalType === "view"  || validateDisabledFields(field.name,formData[field.name])}
                             />
                           </div>
                         )}

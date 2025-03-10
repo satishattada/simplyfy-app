@@ -109,6 +109,7 @@ function DemandView() {
       .then((resp) => {
         const reponse = resp as ContractReq[];
         setContractData(reponse);
+        console.log(reponse);
         setTotalItems(reponse.length);
         setTotalPages(Math.ceil(reponse.length / itemsPerPage));
       }) //set item count

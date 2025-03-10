@@ -34,11 +34,6 @@ const bpReportingFields = [
       fieldType: "text",
     },
     { label: "Contract End Date", name: "contractEndDate", fieldType: "text" },
-    {
-      label: "Contract Currency",
-      name: "contractCurrency",
-      fieldType: "dropdown",
-    },
     { label: "Reference PO", name: "referencePO", fieldType: "text" },
     { label: "PO Amount OMS", name: "POAmountOMS", fieldType: "text" },
     { label: "PO Amount FG", name: "POAmountFG", fieldType: "text" },

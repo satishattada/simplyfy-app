@@ -44,8 +44,12 @@ flex-direction: row;
   border: 1px solid #ccc;
   border-radius: 5px;
   background-color: #f9f9f9;
-  padding: 8px 8px 8px 23px;
-    margin: 4px;
+  padding: 8px;
+  margin: 4px;
+  display: flex
+;
+  justify-content: center;
+  align-items: center;
 }
 .year-section.active{
   background-color: #009900;

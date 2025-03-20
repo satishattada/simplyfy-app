@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Modal, Button } from "react-bootstrap";
 import InputField from "../inputField/inputField";
 import SelectField from "../selectField/selectField";
+import DatePickerInput from "../datePicker/datePicker";
 import "./styles.css";
 import { useAtom } from "jotai";
 import { contractDataAtom } from "../../atoms/contractAtoms";
@@ -10,8 +11,8 @@ import selectOptions from "../../data/dropDown";
 import bpReportingFields from "../../data/reportingField";
 import Table from "react-bootstrap/Table";
 import { FaTrash } from "react-icons/fa";
+import { format } from 'date-fns';
 import contractsService from "../../services/contractsService";
-import { FaCalendarAlt } from "react-icons/fa";
 const ContractManagementModal = ({
   showModal,
   onClose,
@@ -80,34 +81,38 @@ const ContractManagementModal = ({
   ];
   const [selectedYear, setSelectedYear] = useState(null);
   const [selectedYearData, setSelectedYearData] = useState(null);
-
+  const [isCalendarOpen, setIsCalendarOpen] = useState(null);
   useEffect(() => {
     const years = [
       ...new Set(
         formData?.milestoneAmount
-          .filter((item) => item.year != null && item.year !== '') // Filter out null and empty string
+          .filter((item) => item.year != null && item.year !== "") // Filter out null and empty string
           .map((item) => item.year)
       ),
     ];
-    if ((modalType !== "add") && (selectedYear === null ||
-        selectedYear === undefined)
+    if (
+      modalType !== "add" &&
+      (selectedYear === null || selectedYear === undefined)
     ) {
-      setSelectedYear(years[0]);
-    } 
+      setSelectedYear(Number(years[0]));
+    }
   }, [formData]);
   useEffect(() => {
-    const filteredData = formData?.milestoneAmount && formData?.milestoneAmount.filter(
-      (item) => item.year === selectedYear
-    );
+    const filteredData =
+      formData?.milestoneAmount &&
+      formData?.milestoneAmount.filter((item) => item.year === selectedYear);
     const revisions = [
       ...new Set(
         formData?.milestoneAmount
-          .filter((item) => item.revision != null && item.revision !== '') // Filter out null and empty string
+          .filter((item) => item.revision != null && item.revision !== "") // Filter out null and empty string
           .map((item) => item.revision)
       ),
     ];
     setSelectedYearData(filteredData);
     setSelectedRevision(revisions);
+    if (formData.contractStartDate !== "" && formData.contractEndDate !== "") {
+      addYearsForStartAndEndDate();
+    }
   }, [selectedYear, formData]);
   useEffect(() => {
     if (modalType === "edit" || modalType === "view") {
@@ -121,20 +126,23 @@ const ContractManagementModal = ({
     }
   }, [modalType, modalData, initialYearAdded]);
   const handleTabClick = (year) => {
-    setSelectedYear(year);
+    setSelectedYear(Number(year));
   };
-  const setSelectedDateForStartDate = (date,name) => {
-    const dt = date.split("-")[2];
-    if(name === "contractStartDate" && dt?.length === 2){
-      let tempDt = '20'+dt;
-      setSelectedYear(tempDt);
+  const setSelectedDateForStartDate = (date, name) => {
+    const formattedDate = format(date, 'dd-MMM-yy');
+    const dt = formattedDate.split("-")[2];
+      if (dt?.length === 2) {
+      let tempDt = 20 + dt;
+      if (name === "contractStartDate") {
+        setSelectedYear(Number(tempDt));
+      }
       setFormData((prevData) => ({
         ...prevData,
         milestoneAmount: [
           ...prevData.milestoneAmount,
           {
             revision: 0,
-            year: tempDt,
+            year: Number(tempDt),
             month: {
               jan: "",
               feb: "",
@@ -153,48 +161,21 @@ const ContractManagementModal = ({
         ],
       }));
     }
-   else if(name === "contractEndDate" && dt?.length === 2){
-   
-    setFormData((prevData) => ({
-      ...prevData,
-      milestoneAmount: [
-        ...prevData.milestoneAmount,
-        {
-          revision: 0,
-          year: '20'+dt,
-          month: {
-            jan: "",
-            feb: "",
-            mar: "",
-            apr: "",
-            may: "",
-            jun: "",
-            jul: "",
-            aug: "",
-            sep: "",
-            oct: "",
-            nov: "",
-            dec: "",
-          },
-        },
-      ],
-    }));
-  }
   };
-    
+
   const handleChange = (e, name) => {
-    const value = e.target.value;
+    const value = e.target ? e.target.value : e;
     setFormData((prevData) => ({
       ...prevData,
-      [name]: value,
+      [name]: value instanceof Date ? format(value, 'dd-MMM-yy') : value,
     }));
     const error = validateField(name, value);
     setErrors({
       ...errors,
       [name]: error,
     });
-    if(name === "contractStartDate" || name === "contractEndDate"){
-      setSelectedDateForStartDate(value,name);
+    if (name === "contractStartDate" || name === "contractEndDate") {
+      setSelectedDateForStartDate(value, name);
     }
   };
   const validateField = (name, value) => {
@@ -221,36 +202,40 @@ const ContractManagementModal = ({
       if (!value) {
         error = "BP sub portfolio is required";
       }
-    } else if(name === "contractCurrency"){
-      if(!value){
+    } else if (name === "contractCurrency") {
+      if (!value) {
         error = "Contract currency is required";
-      } 
-    }else if(name === "contractFGID"){
-      if(!value){
+      }
+    } else if (name === "contractFGID") {
+      if (!value) {
         error = "Contract FGID is required";
       }
     }
     return error;
   };
   const validateDisabledFields = (name, value) => {
-    if(name === "contractCurrency" && selectedRevision?.length > 1 && value !== ""){
-       return true;
-    } 
-    if(name === "contractFGID" && value !== ""){
+    if (
+      name === "contractCurrency" &&
+      selectedRevision?.length > 1 &&
+      value !== ""
+    ) {
       return true;
-   } 
+    }
+    if (name === "contractFGID" && value !== "") {
+      return true;
+    }
     // else if(name === "contractStartDate" && selectedRevision?.length === 1 && value !== ""){
     //   return true;
     // }
-  }
-  const handleYearChange = (e, yearIndex, month) => {
-    const value = e.target.value;
-    setFormData((prevData) => {
-      const updatedMilestoneAmount = [...prevData.milestoneAmount];
-      updatedMilestoneAmount[yearIndex].month[month] = value;
-      return { ...prevData, milestoneAmount: updatedMilestoneAmount };
-    });
   };
+  // const handleYearChange = (e, yearIndex, month) => {
+  //   const value = e.target.value;
+  //   setFormData((prevData) => {
+  //     const updatedMilestoneAmount = [...prevData.milestoneAmount];
+  //     updatedMilestoneAmount[yearIndex].month[month] = value;
+  //     return { ...prevData, milestoneAmount: updatedMilestoneAmount };
+  //   });
+  // };
 
   const handleYearValueChange = (
     e,
@@ -277,7 +262,7 @@ const ContractManagementModal = ({
     let monthKey = monthNames[monthIndex];
     const updatedData = formData.milestoneAmount.map((item, index) => {
       if (item.year === selectedYear && item.revision === revision) {
-       return {
+        return {
           ...item,
           month: {
             ...item.month,
@@ -291,11 +276,8 @@ const ContractManagementModal = ({
   };
 
   const handleMonthValueChange = (updatedData) => {
-     setFormData((prevData) => {
+    setFormData((prevData) => {
       // const updatedMilestoneAmount = [...prevData.milestoneAmount];
-      // console.log(updatedMilestoneAmount);
-
-      // console.log("inside yearIndex.........",yearIndex);
       // if(updatedMilestoneAmount[yearIndex].year !== selectedYear){
       //   updatedMilestoneAmount[updatedMilestoneAmount.length - 1].month[monthKey] = newYear;
       // }else{
@@ -306,21 +288,33 @@ const ContractManagementModal = ({
   };
 
   const findDuplicateYears = () => {
-     const years = [
+    const years = [
       ...new Set(
         formData?.milestoneAmount
-          .filter((item) => item.year != null && item.year !== '')
+          .filter((item) => item.year != null && item.year !== "")
           .map((item) => item.year)
       ),
     ];
+
     return years;
   };
 
   const addNewRevision = () => {
-    const existingYears = formData.milestoneAmount.map(
-      (milestone) => milestone.year
-    );
-    if (existingYears.includes("")) {
+    if (
+      !selectedYear &&
+      formData.contractStartDate === "" &&
+      formData.contractEndDate === ""
+    ) {
+      alert("Please fill the contract start date and end date first.");
+      return;
+    }
+    const cleanedMilestoneAmount = formData?.milestoneAmount.map((item) => {
+      return (
+        item.month && Object.values(item.month).some((value) => value !== "")
+      );
+    });
+    const containsTrue = cleanedMilestoneAmount.some((value) => value === true);
+    if (!containsTrue) {
       alert("Please fill in the existing year before adding a new one.");
       return;
     }
@@ -330,7 +324,7 @@ const ContractManagementModal = ({
         ...prevData.milestoneAmount,
         {
           revision: selectedYearData.length,
-          year: selectedYear,
+          year: Number(selectedYear),
           month: {
             jan: "",
             feb: "",
@@ -375,32 +369,15 @@ const ContractManagementModal = ({
       linkedDPSNumber: "",
       infosysContractType: "",
       totalSoWWorkers: "",
-      milestoneAmount: [
-        {
-          revision: 0,
-          year: "",
-          month: {
-            jan: "",
-            feb: "",
-            mar: "",
-            apr: "",
-            may: "",
-            jun: "",
-            jul: "",
-            aug: "",
-            sep: "",
-            oct: "",
-            nov: "",
-            dec: "",
-          },
-        },
-      ],
+      milestoneAmount: [],
     });
   };
-  const deleteRevision = (yearIndex,revision) => {
+  const deleteRevision = (yearIndex, revision) => {
     setFormData((prevData) => {
       const updatedMilestoneAmount = [...prevData.milestoneAmount];
-     const filterData = updatedMilestoneAmount.filter(item => !(item.revision === revision && item.year === selectedYear));
+      const filterData = updatedMilestoneAmount.filter(
+        (item) => !(item.revision === revision && item.year === selectedYear)
+      );
       return { ...prevData, milestoneAmount: filterData };
     });
   };
@@ -412,10 +389,10 @@ const ContractManagementModal = ({
         Object.values(milestone.month).some((value) => value !== "")
     );
 
-    const updatedFormData = {
-      ...formData,
-      milestoneAmount: cleanedMilestoneAmount,
-    };
+    // const updatedFormData = {
+    //   ...formData,
+    //   milestoneAmount: cleanedMilestoneAmount,
+    // };
 
     // if (modalType === "edit") {
     //   const updatedContractData = contractData.map((item) =>
@@ -425,35 +402,34 @@ const ContractManagementModal = ({
     // } else {
     //   setContractData([...contractData, updatedFormData]);
     // }
-    if(modalType === "add"){
+    if (modalType === "add") {
       addNewContract();
-    }else if(modalType === "edit"){
+    } else if (modalType === "edit") {
       updateEditedContract();
     }
-   
   };
   const updateEditedContract = () => {
     contractsService
-    .updateEditedContract(formData)
-    .then((resp) => {
-      console.log(resp);
-      handleCloseModal();
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-  }
+      .updateEditedContract(formData)
+      .then((resp) => {
+        console.log(resp);
+        handleCloseModal();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
   const addNewContract = () => {
     contractsService
-    .addContract(formData)
-    .then((resp) => {
-      console.log(resp);
-      handleCloseModal();
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-  }
+      .addContract(formData)
+      .then((resp) => {
+        console.log(resp);
+        handleCloseModal();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
   const resetErrorMessages = () => {
     setErrors({
       bpSubPortfolio: "",
@@ -514,30 +490,79 @@ const ContractManagementModal = ({
     setInitialYearAdded(false);
     resetErrorMessages();
     onClose();
-    if(modalType === "edit" || modalType === "add"){
+    if (modalType === "edit" || modalType === "add") {
       onFetchData();
     }
   };
 
-  const addNewRevisionYear = (e) => {
-    setFormData((prevData) => {
-      const updatedMilestoneAmount = [
-        {
-          revision:
-            selectedYearData?.length <= 1 ? 0 : selectedYearData?.length,
-          year: parseInt(e.target.value),
-          month: { ...prevData.milestoneAmount[0].month },
-        },
-      ];
-      return { ...prevData, milestoneAmount: updatedMilestoneAmount };
-    });
-  };
+  // const addNewRevisionYear = (e) => {
+  //   setFormData((prevData) => {
+  //     const updatedMilestoneAmount = [
+  //       {
+  //         revision:
+  //           selectedYearData?.length <= 1 ? 0 : selectedYearData?.length,
+  //         year: parseInt(e.target.value),
+  //         month: { ...prevData.milestoneAmount[0].month },
+  //       },
+  //     ];
+  //     return { ...prevData, milestoneAmount: updatedMilestoneAmount };
+  //   });
+  // };
   const validateStartAndEndDate = () => {
-    if((!selectedYear) && formData.contractStartDate === ""){
+    if (!selectedYear && formData.contractStartDate === "") {
       alert("Please fill the contract start date and end date first.");
-      return
+      return;
     }
-  }
+  };
+  const addYearsForStartAndEndDate = () => {
+    const yearsInTemp = new Set(
+      formData.milestoneAmount.map((item) => item.year)
+    );
+
+    // Find the min and max years from the array
+    const minYear = Math.min(
+      ...formData.milestoneAmount.map((item) => +item.year)
+    );
+    const maxYear = Math.max(
+      ...formData.milestoneAmount.map((item) => +item.year)
+    );
+
+    // Generate all years from minYear to maxYear
+    const missingYears = Array.from(
+      { length: maxYear - minYear + 1 },
+      (_, i) => minYear + i
+    ).filter((year) => !yearsInTemp.has(year)); // Filter out years that already exist
+    // Add the missing years to the temp array
+    const newYears = missingYears.map((year) => ({
+      revision: 0,
+      year: Number(year),
+      month: {
+        jan: "",
+        feb: "",
+        mar: "",
+        apr: "",
+        may: "",
+        jun: "",
+        jul: "",
+        aug: "",
+        sep: "",
+        oct: "",
+        nov: "",
+        dec: "",
+      },
+    }));
+    formData.milestoneAmount.push(...newYears);
+    formData.milestoneAmount.sort(
+      (a, b) => parseInt(a.year, 10) - parseInt(b.year, 10)
+    );
+  };
+  const handleDateChange = (date, fieldName) => {
+    handleChange(date, fieldName); // Update form data
+    setIsCalendarOpen(null); // Close calendar once date is selected
+  };
+  const handleCalendarClick = (fieldName) => {
+    setIsCalendarOpen(isCalendarOpen === fieldName ? null : fieldName); // Toggle visibility of calendar
+  };
   return (
     <Modal
       show={showModal}
@@ -589,7 +614,27 @@ const ContractManagementModal = ({
                               name={field.name}
                               value={formData[field.name]}
                               onChange={(e) => handleChange(e, field.name)}
-                              readOnly={modalType === "view" || validateDisabledFields(field.name,formData[field.name])}
+                              readOnly={
+                                modalType === "view" ||
+                                validateDisabledFields(
+                                  field.name,
+                                  formData[field.name]
+                                )
+                              }
+                            />
+                          </div>
+                        ) : field.fieldType === "calender" ? (
+                          <div>
+                            <DatePickerInput
+                              key={field.name}
+                              field={field}
+                              formData={formData}
+                              handleChange={handleChange}
+                              isCalendarOpen={isCalendarOpen}
+                              handleCalendarClick={handleCalendarClick}
+                              handleDateChange={handleDateChange}
+                              modalType={modalType}
+                              validateDisabledFields={validateDisabledFields}
                             />
                           </div>
                         ) : (
@@ -599,7 +644,13 @@ const ContractManagementModal = ({
                               value={formData[field.name]}
                               onChange={(e) => handleChange(e, field.name)}
                               options={selectOptions[field.name] || []}
-                              readOnly={modalType === "view"  || validateDisabledFields(field.name,formData[field.name])}
+                              readOnly={
+                                modalType === "view" ||
+                                validateDisabledFields(
+                                  field.name,
+                                  formData[field.name]
+                                )
+                              }
                             />
                           </div>
                         )}
@@ -610,7 +661,7 @@ const ContractManagementModal = ({
                               marginLeft: "13px",
                               display: "block",
                             }}
-                            key={field.name}  
+                            key={field.name}
                           >
                             {errors[field.name]}
                           </span>
@@ -650,27 +701,24 @@ const ContractManagementModal = ({
                         Add New Revision
                       </Button>
                     )}
-                     {selectedYear !== undefined && (
-                    <div className="milestone-section">
-                       
-                        {formData?.milestoneAmount && findDuplicateYears(formData.milestoneAmount).map(
-                          (milestone, index) => (
-                           
-                            <div
-                              key={index}
-                              className={`year-section ${
-                                selectedYear === milestone ? "active" : ""
-                              }`}
-                              onClick={() => handleTabClick(milestone)}
-                            >
-                              {milestone}
-                            </div>
-                            
-                          )
-                        )}
-                      
-                    </div>
-                  )}
+                    {selectedYear !== undefined && (
+                      <div className="milestone-section">
+                        {formData?.milestoneAmount &&
+                          findDuplicateYears(formData.milestoneAmount).map(
+                            (milestone, index) => (
+                              <div
+                                key={index}
+                                className={`year-section ${
+                                  selectedYear === milestone ? "active" : ""
+                                }`}
+                                onClick={() => handleTabClick(milestone)}
+                              >
+                                {milestone}
+                              </div>
+                            )
+                          )}
+                      </div>
+                    )}
                     <Table>
                       <thead>
                         <tr>
@@ -726,7 +774,9 @@ const ContractManagementModal = ({
                                 {month.revision !== 0 &&
                                   modalType !== "view" && (
                                     <button
-                                      onClick={() => deleteRevision(index, month.revision)}
+                                      onClick={() =>
+                                        deleteRevision(index, month.revision)
+                                      }
                                       className="trash-button"
                                       disabled={
                                         formData.milestoneAmount.length === 1

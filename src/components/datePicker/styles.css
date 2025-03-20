@@ -1,0 +1,15 @@
+.inputFieldLabelStyle {
+    font-weight: bold;
+    font-size: 14px;
+    margin-bottom: 10px;
+ }
+ .input-wrapper .inputdatefield{
+    height: 40px;
+    width: 88%;
+    font-size: 14px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+ }
+ [type=button] {
+    margin-left: 5px;
+ }

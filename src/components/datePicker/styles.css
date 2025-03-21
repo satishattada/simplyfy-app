@@ -11,6 +11,6 @@
     border: 1px solid #ccc;
     padding-left: 10px;
  }
- [type=button] {
-    margin-left: 5px;
- }
+ /* [type=button] {
+   // margin-left: 5px;
+ } */

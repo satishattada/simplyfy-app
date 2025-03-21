@@ -91,9 +91,7 @@ const ContractManagementModal = ({
       ),
     ];
     if (
-      modalType !== "add" &&
-      (selectedYear === null || selectedYear === undefined)
-    ) {
+      modalType !== "add" && !selectedYear) {
       setSelectedYear(Number(years[0]));
     }
   }, [formData]);
@@ -705,7 +703,7 @@ const setMilestoneAmountData =(rev, yr)=>{
                     {modalType !== "view" && (
                       <Button
                         className="add-year-button"
-                        variant="primary"
+                        variant=""
                         onClick={addNewRevision}
                       >
                         Add New Revision

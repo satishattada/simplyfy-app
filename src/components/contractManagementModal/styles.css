@@ -53,6 +53,7 @@ flex-direction: row;
 }
 .year-section.active{
   background-color: #009900;
+  color: white;
 }
 .milestone-header {
   display: flex;
@@ -88,9 +89,11 @@ flex-direction: row;
   margin: 5px;
 }
 
-.add-year-button {
+#collapseThree .add-year-button {
   display: block;
   margin-bottom: 20px;
+  background-color: #86bf54;
+  margin-top: 4px;
 }
 .inputSelectField{
   width: 100%;

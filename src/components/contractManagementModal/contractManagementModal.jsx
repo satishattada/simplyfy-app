@@ -131,38 +131,48 @@ const ContractManagementModal = ({
   const setSelectedDateForStartDate = (date, name) => {
     const formattedDate = format(date, 'dd-MMM-yy');
     const dt = formattedDate.split("-")[2];
-      if (dt?.length === 2) {
-      let tempDt = 20 + dt;
+      let tempDt = dt?.length === 2 ? 20 + dt : dt;
+      const newYear = new Date(formattedDate).getFullYear();
       if (name === "contractStartDate") {
-        setSelectedYear(Number(tempDt));
+          setSelectedYear(Number(tempDt));
+          const currentYear = new Date(formData.contractStartDate).getFullYear();
+         if (newYear !== currentYear) {
+           setMilestoneAmountData(0,tempDt);
+         }
+      } else if(name === "contractEndDate"){
+        const currentYear = new Date(formData.contractEndDate).getFullYear();
+        if (newYear !== currentYear) {  
+          setMilestoneAmountData(0, tempDt);
+        }
       }
-      setFormData((prevData) => ({
-        ...prevData,
-        milestoneAmount: [
-          ...prevData.milestoneAmount,
-          {
-            revision: 0,
-            year: Number(tempDt),
-            month: {
-              jan: "",
-              feb: "",
-              mar: "",
-              apr: "",
-              may: "",
-              jun: "",
-              jul: "",
-              aug: "",
-              sep: "",
-              oct: "",
-              nov: "",
-              dec: "",
-            },
-          },
-        ],
-      }));
-    }
+    
   };
-
+const setMilestoneAmountData =(rev, yr)=>{
+  setFormData((prevData) => ({
+    ...prevData,
+    milestoneAmount: [
+      ...prevData.milestoneAmount,
+      {
+        revision: rev,
+        year: Number(yr),
+        month: {
+          jan: "",
+          feb: "",
+          mar: "",
+          apr: "",
+          may: "",
+          jun: "",
+          jul: "",
+          aug: "",
+          sep: "",
+          oct: "",
+          nov: "",
+          dec: "",
+        },
+      },
+    ],
+  }));
+}
   const handleChange = (e, name) => {
     const value = e.target ? e.target.value : e;
     setFormData((prevData) => ({
@@ -509,7 +519,7 @@ const ContractManagementModal = ({
   //   });
   // };
   const validateStartAndEndDate = () => {
-    if (!selectedYear && formData.contractStartDate === "") {
+    if (!selectedYear && !formData.contractStartDate && !formData.contractEndDate) {
       alert("Please fill the contract start date and end date first.");
       return;
     }
@@ -629,7 +639,7 @@ const ContractManagementModal = ({
                               key={field.name}
                               field={field}
                               formData={formData}
-                              handleChange={handleChange}
+                             // handleChange={handleChange}
                               isCalendarOpen={isCalendarOpen}
                               handleCalendarClick={handleCalendarClick}
                               handleDateChange={handleDateChange}

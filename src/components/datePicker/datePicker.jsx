@@ -4,7 +4,7 @@ import { FaCalendarAlt } from 'react-icons/fa';
 import './styles.css';
 import "react-datepicker/dist/react-datepicker.css";
 
-const DatePickerInput = ({ field, formData, handleChange, isCalendarOpen, handleCalendarClick, handleDateChange, modalType, validateDisabledFields }) => (
+const DatePickerInput = ({ field, formData, isCalendarOpen, handleCalendarClick, handleDateChange, modalType, validateDisabledFields }) => (
     
     <div className="inputField" key={field.name}>
     <div className="input-wrapper">

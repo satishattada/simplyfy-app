@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./styles.css";
 import Table from "react-bootstrap/Table";
-import { Pagination } from "react-bootstrap";
+import { Pagination, Spinner } from "react-bootstrap";
 import { Form, InputGroup, Button } from "react-bootstrap";
 import { FaSearch, FaTimes } from "react-icons/fa";
 import contractsService from "../../services/contractsService";
@@ -12,17 +12,7 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import ContractManagementModal from "../contractManagementModal/contractManagementModal";
 import transformContractData from "../../helper/helper";
-interface Request {
-  id: string;
-  dateRequested: string;
-  requestedBy: string;
-  appName: string;
-  location: string;
-  skills: string;
-  roll: string;
-  duration: string;
-  status: string;
-}
+
 function DemandView() {
   const itemsPerPage = 10;
   const [query, setQuery] = useState<string>("");
@@ -36,6 +26,8 @@ function DemandView() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [contractData, setContractData] = useAtom(contractDataAtom);
+  const [loading, setLoading] = useState<boolean>(true);
+
   const handleSearchChange = (query: string) => {
     setQuery(query);
   };
@@ -43,10 +35,9 @@ function DemandView() {
   useEffect(() => {
     handleFetchData();
   }, []);
+
   useEffect(() => {
     if (query === "" || query === undefined) {
-      //setTotalItems(Math.ceil(teamData.length / itemsPerPage));
-      //
       const startIndex = (currentPage - 1) * itemsPerPage;
       const currentItems = contractData.slice(
         startIndex,
@@ -56,22 +47,21 @@ function DemandView() {
       setTotalPages(Math.ceil(contractData.length / itemsPerPage));
     } else {
       // Filter data based on the query
-        const filtered =
+      const filtered =
         contractData &&
         contractData?.filter(
           (item: any) =>
-           // item.id.toString().includes(query) ||
             item.contractName?.toLowerCase().includes(query?.toLowerCase()) ||
             item.bpSubPortfolio?.toLowerCase().includes(query?.toLowerCase()) ||
             item.contractType?.toLowerCase().includes(query?.toLowerCase()) ||
             item.teamType?.toLowerCase().includes(query?.toLowerCase()) ||
             item.referencePO?.toString().includes(query?.toLowerCase()) ||
-            // item.PORevision?.toLowerCase().includes(query?.toLowerCase()) ||
-            item.contractCurrency?.toLowerCase().includes(query?.toLowerCase()) ||
+            item.contractCurrency
+              ?.toLowerCase()
+              .includes(query?.toLowerCase()) ||
             item.contractFGID?.toLowerCase().includes(query?.toLowerCase()) ||
             item.revenueType?.toLowerCase().includes(query?.toLowerCase())
         );
-      // setTotalItems(Math.ceil(filtered.length / itemsPerPage));
       const startIndex = (currentPage - 1) * itemsPerPage;
       const currentItems = filtered.slice(
         startIndex,
@@ -81,6 +71,7 @@ function DemandView() {
       setTotalPages(Math.ceil(filtered.length / itemsPerPage));
     }
   }, [contractData, query, currentPage]);
+
   const handleModal = (type: string, request?: any) => {
     setShowModal(true);
     setModalType(type);
@@ -96,76 +87,79 @@ function DemandView() {
         setModalData({});
     }
   };
+
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber);
   };
+
   const handleCloseModel = () => {
     setShowModal(false);
     setModalData({});
   };
+
   const handleFetchData = () => {
+    setLoading(true);
     contractsService
       .getContractsData()
       .then((resp) => {
         const reponse = resp as ContractReq[];
         setContractData(reponse);
-        console.log(reponse);
         setTotalItems(reponse.length);
         setTotalPages(Math.ceil(reponse.length / itemsPerPage));
-      }) //set item count
+        setLoading(false);
+      })
       .catch((err) => {
         console.log(err);
+        setLoading(false);
       });
-  }
+  };
 
+  const handleBulkUpload = async (event: any) => {
+    alert(`Bulk Upload under development ...`);
+    // const file = event.target.files[0];
+    // const reader = new FileReader();
+    // reader.onload = async (e) => {
+    //   if (e.target && e.target.result) {
+    //     const data = new Uint8Array(e.target.result as ArrayBuffer);
+    //     const workbook = XLSX.read(data, { type: "array", cellDates: true });
+    //     const sheetName = workbook.SheetNames[0];
+    //     const worksheet = workbook.Sheets[sheetName];
+    //     const jsonData = XLSX.utils.sheet_to_json(worksheet, { raw: false, dateNF: 'dd-mmm-yy' });
+    //     const transformedData = transformContractData(jsonData);
+    //     console.log(transformedData);
 
+    //     try {
+    //       const response = await fetch('https://operations-backend-production-5877.up.railway.app/contract/bulk', {
+    //         method: 'POST',
+    //         headers: {
+    //           'Content-Type': 'application/json',
+    //         },
+    //         body: JSON.stringify(transformedData),
+    //       });
 
-const handleBulkUpload = async (event: any) => {
-  alert(`Bulk Upload under developement ...`);
-  // const file = event.target.files[0];
-  // const reader = new FileReader();
-  // reader.onload = async (e) => {
-  //   if (e.target && e.target.result) {
-  //     const data = new Uint8Array(e.target.result as ArrayBuffer);
-  //     const workbook = XLSX.read(data, { type: "array", cellDates: true });
-  //     const sheetName = workbook.SheetNames[0];
-  //     const worksheet = workbook.Sheets[sheetName];
-  //     const jsonData = XLSX.utils.sheet_to_json(worksheet, { raw: false, dateNF: 'dd-mmm-yy' });
-  //     const transformedData = transformContractData(jsonData);
-  //     console.log(transformedData);
+    //       if (!response.ok) {
+    //         const errorData = await response.json();
+    //         throw new Error(`Error: ${response.statusText} - ${errorData.message.join(', ')}`);
+    //       }
 
-  //     try {
-  //       const response = await fetch('https://operations-backend-production-5877.up.railway.app/contract/bulk', {
-  //         method: 'POST',
-  //         headers: {
-  //           'Content-Type': 'application/json',
-  //         },
-  //         body: JSON.stringify(transformedData),
-  //       });
+    //       const result = await response.json();
+    //       alert('Bulk upload successful!');
+    //       handleFetchData(); // Fetch the updated data
+    //     } catch (error) {
+    //       console.error('Error uploading bulk data:', error);
+    //       if (error instanceof Error) {
+    //         alert(`Bulk upload failed: ${error.message}`);
+    //       } else {
+    //         alert('Bulk upload failed: An unknown error occurred.');
+    //       }
+    //     }
+    //   }
+    // };
+    // reader.readAsArrayBuffer(file);
+  };
 
-  //       if (!response.ok) {
-  //         const errorData = await response.json();
-  //         throw new Error(`Error: ${response.statusText} - ${errorData.message.join(', ')}`);
-  //       }
-
-  //       const result = await response.json();
-  //       alert('Bulk upload successful!');
-  //       handleFetchData(); // Fetch the updated data
-  //     } catch (error) {
-  //       console.error('Error uploading bulk data:', error);
-  //       if (error instanceof Error) {
-  //         alert(`Bulk upload failed: ${error.message}`);
-  //       } else {
-  //         alert('Bulk upload failed: An unknown error occurred.');
-  //       }
-  //     }
-  //   }
-  // };
-  // reader.readAsArrayBuffer(file);
-};
- 
   const downloadExcel = () => {
-    const flattenedData = contractData.flatMap(item => {
+    const flattenedData = contractData.flatMap((item) => {
       return item.milestoneAmount.map((yearData: any) => {
         return {
           ...item,
@@ -183,7 +177,6 @@ const handleBulkUpload = async (event: any) => {
     saveAs(blob, `contracts.xls`);
   };
 
-  // Function to convert a binary string to an array buffer
   const s2ab = (s: string) => {
     const buf = new ArrayBuffer(s.length);
     const view = new Uint8Array(buf);
@@ -192,113 +185,126 @@ const handleBulkUpload = async (event: any) => {
     }
     return buf;
   };
+
   return (
     <>
-    <ContractManagementModal
-     showModal={showModal}
-     onClose={() => handleCloseModel()}
-     modalType={modalType}
-     modalData={modalType === "edit" || modalType === "view"  ? modalData : undefined}
-     onFetchData={() => handleFetchData()}
-    />
-    <div className="d-flex justify-content-between mt-5 mb-4">
-      <SearchComponent onSearch={handleSearchChange} />
-       <div className="d-flex align-items-center">
-                <i
-                  className="bi bi-plus-circle edit-btn mx-2"
-                  onClick={() => handleModal("add",{})}
-                ></i>
-                  <i className="bi bi-download edit-btn mx-2" onClick={downloadExcel}></i>
-                {/* <input
+      <ContractManagementModal
+        showModal={showModal}
+        onClose={() => handleCloseModel()}
+        modalType={modalType}
+        modalData={
+          modalType === "edit" || modalType === "view" ? modalData : undefined
+        }
+        onFetchData={() => handleFetchData()}
+      />
+      <div className="d-flex justify-content-between mt-5 mb-4">
+        <SearchComponent onSearch={handleSearchChange} />
+        <div className="d-flex align-items-center">
+          <i
+            className="bi bi-plus-circle edit-btn mx-2"
+            onClick={() => handleModal("add", {})}
+          ></i>
+          <i
+            className="bi bi-download edit-btn mx-2"
+            onClick={downloadExcel}
+          ></i>
+          {/* <input
                   type="file"
                   accept=".xlsx, .xls"
                   onChange={handleBulkUpload}
                   style={{ display: "none" }}
                   id="bulkUpload"
                 /> */}
-                <label htmlFor="bulkUpload" className="mx-2">
-                  <i className="bi bi-upload edit-btn" onClick={handleBulkUpload}></i>
-                </label>
-              </div>
-      </div>  
-      <Table>
-        <thead>
-          <tr>
-            {/* <td>ID</td> */}
-            <td>Contract FGID</td>
-            <td>Contract Name</td>
-            <td>bp SubPortfolio</td>
-            <td>Contract Type</td>
-            <td>Team Type</td>
-            <td>Reference PO</td>
-            {/* <td>PO Revision</td> */}
-            <td>Contract Currency</td>
-            <td>Revenue Type</td>
-            <td>Action</td>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredData && filteredData.length > 0 ? (
-            filteredData.map((request) => (
-              <tr key={request.id}>
-                <td
-                  style={{
-                    color: "blue",
-                    textDecoration: "underline",
-                    cursor: "pointer",
-                  }}
-                  onClick={() => handleModal("view", request)}
-                >
-                  {request.contractFGID}
-                </td>
-                <td>{request.contractName}</td>
-                <td>{request.bpSubPortfolio}</td>
-                <td>{request.contractType}</td>
-                <td>{request.teamType}</td>
-                <td>{request.referencePO}</td>
-                {/* <td>{request.PORevision}</td> */}
-                <td>{request.contractCurrency}</td>
-                <td>{request.revenueType}</td>
-                <td>
-                  <Button
-                    variant="outline-secondary"
-                    size="sm"
-                    className="rounded-btn"
-                    onClick={() => handleModal("edit",request)}
-                  >
-                    Edit
-                  </Button>
-                </td>
+          <label htmlFor="bulkUpload" className="mx-2">
+            <i className="bi bi-upload edit-btn" onClick={handleBulkUpload}></i>
+          </label>
+        </div>
+      </div>
+      {loading ? (
+        <div className="text-center">
+          <Spinner animation="border" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </Spinner>
+        </div>
+      ) : (
+        <>
+          <Table>
+            <thead>
+              <tr>
+                <td>Contract FGID</td>
+                <td>Contract Name</td>
+                <td>bp SubPortfolio</td>
+                <td>Contract Type</td>
+                <td>Team Type</td>
+                <td>Reference PO</td>
+                <td>Contract Currency</td>
+                <td>Revenue Type</td>
+                <td>Action</td>
               </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan={9} className="text-center">
-                No matching data found
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </Table>
-      <Pagination>
-        <Pagination.Prev
-          onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
-        />
-        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-          <Pagination.Item
-            key={page}
-            active={page === currentPage}
-            onClick={() => handlePageChange(page)}
-          >
-            {page}
-          </Pagination.Item>
-        ))}
-        <Pagination.Next
-          onClick={() =>
-            handlePageChange(Math.min(currentPage + 1, totalPages))
-          }
-        />
-      </Pagination>
+            </thead>
+            <tbody>
+              {filteredData && filteredData.length > 0 ? (
+                filteredData.map((request) => (
+                  <tr key={request.id}>
+                    <td
+                      style={{
+                        color: "blue",
+                        textDecoration: "underline",
+                        cursor: "pointer",
+                      }}
+                      onClick={() => handleModal("view", request)}
+                    >
+                      {request.contractFGID}
+                    </td>
+                    <td>{request.contractName}</td>
+                    <td>{request.bpSubPortfolio}</td>
+                    <td>{request.contractType}</td>
+                    <td>{request.teamType}</td>
+                    <td>{request.referencePO}</td>
+                    <td>{request.contractCurrency}</td>
+                    <td>{request.revenueType}</td>
+                    <td>
+                      <Button
+                        variant="outline-secondary"
+                        size="sm"
+                        className="rounded-btn"
+                        onClick={() => handleModal("edit", request)}
+                      >
+                        Edit
+                      </Button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={9} className="text-center">
+                    No matching data found
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </Table>
+          <Pagination>
+            <Pagination.Prev
+              onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
+            />
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <Pagination.Item
+                key={page}
+                active={page === currentPage}
+                onClick={() => handlePageChange(page)}
+              >
+                {page}
+              </Pagination.Item>
+            ))}
+            <Pagination.Next
+              onClick={() =>
+                handlePageChange(Math.min(currentPage + 1, totalPages))
+              }
+            />
+          </Pagination>
+        </>
+      )}
     </>
   );
 }

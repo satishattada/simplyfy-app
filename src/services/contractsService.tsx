@@ -26,7 +26,7 @@ interface contractReq {
   totalSoWWorkers: number;
   milestoneAmount: any
 }
-const apiURL = 'http://localhost:3000/contract';
+const apiURL = 'https://operations-backend-production.up.railway.app/contract';
 const getContractsData = async() => {
   try {
     const response = await fetch(apiURL);

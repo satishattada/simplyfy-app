@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./styles.css";
 import Table from "react-bootstrap/Table";
-import { Pagination, Spinner } from "react-bootstrap";
+import { Pagination, Spinner, Modal } from "react-bootstrap";
 import { Form, InputGroup, Button } from "react-bootstrap";
 import { FaSearch, FaTimes } from "react-icons/fa";
 import contractsService from "../../services/contractsService";
@@ -26,7 +26,9 @@ function DemandView() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [contractData, setContractData] = useAtom(contractDataAtom);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [tableLoading, setTableLoading] = useState<boolean>(true); 
+  const [uploadLoading, setUploadLoading] = useState<boolean>(false); 
+  const [uploadMessage, setUploadMessage] = useState<string>("");
 
   const handleSearchChange = (query: string) => {
     setQuery(query);
@@ -98,7 +100,7 @@ function DemandView() {
   };
 
   const handleFetchData = () => {
-    setLoading(true);
+    setTableLoading(true);
     contractsService
       .getContractsData()
       .then((resp) => {
@@ -106,65 +108,80 @@ function DemandView() {
         setContractData(reponse);
         setTotalItems(reponse.length);
         setTotalPages(Math.ceil(reponse.length / itemsPerPage));
-        setLoading(false);
+        setTableLoading(false);
       })
       .catch((err) => {
         console.log(err);
-        setLoading(false);
+        setTableLoading(false);
       });
   };
 
   const handleBulkUpload = async (event: any) => {
-    alert(`Bulk Upload under development ...`);
-    // const file = event.target.files[0];
-    // const reader = new FileReader();
-    // reader.onload = async (e) => {
-    //   if (e.target && e.target.result) {
-    //     const data = new Uint8Array(e.target.result as ArrayBuffer);
-    //     const workbook = XLSX.read(data, { type: "array", cellDates: true });
-    //     const sheetName = workbook.SheetNames[0];
-    //     const worksheet = workbook.Sheets[sheetName];
-    //     const jsonData = XLSX.utils.sheet_to_json(worksheet, { raw: false, dateNF: 'dd-mmm-yy' });
-    //     const transformedData = transformContractData(jsonData);
-    //     console.log(transformedData);
+    const file = event.target.files[0];
+    const reader = new FileReader();
+    setUploadLoading(true); 
+    setUploadMessage("");
+    reader.onload = async (e) => {
+      if (e.target && e.target.result) {
+        const data = new Uint8Array(e.target.result as ArrayBuffer);
+        const workbook = XLSX.read(data, { type: "array", cellDates: true });
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, {
+          raw: false,
+          dateNF: "dd-mmm-yy",
+        });
+        const transformedData = transformContractData(jsonData);
+        console.log(transformedData);
 
-    //     try {
-    //       const response = await fetch('https://operations-backend-production-5877.up.railway.app/contract/bulk', {
-    //         method: 'POST',
-    //         headers: {
-    //           'Content-Type': 'application/json',
-    //         },
-    //         body: JSON.stringify(transformedData),
-    //       });
+        try {
+          const response = await fetch(
+            "https://operations-backend-production.up.railway.app/contract/bulk-add-edit",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(transformedData),
+            }
+          );
 
-    //       if (!response.ok) {
-    //         const errorData = await response.json();
-    //         throw new Error(`Error: ${response.statusText} - ${errorData.message.join(', ')}`);
-    //       }
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(
+              `Error: ${response.statusText} - ${errorData.message.join(", ")}`
+            );
+          }
 
-    //       const result = await response.json();
-    //       alert('Bulk upload successful!');
-    //       handleFetchData(); // Fetch the updated data
-    //     } catch (error) {
-    //       console.error('Error uploading bulk data:', error);
-    //       if (error instanceof Error) {
-    //         alert(`Bulk upload failed: ${error.message}`);
-    //       } else {
-    //         alert('Bulk upload failed: An unknown error occurred.');
-    //       }
-    //     }
-    //   }
-    // };
-    // reader.readAsArrayBuffer(file);
+          const result = await response.json();
+          setUploadMessage("Contracts processed successfully!"); 
+          handleFetchData(); 
+        } catch (error) {
+          console.error("Error uploading bulk data:", error);
+          if (error instanceof Error) {
+            setUploadMessage(`Bulk upload failed: ${error.message}`); 
+          } else {
+            setUploadMessage("Bulk upload failed: An unknown error occurred.");
+          }
+        } finally {
+          setUploadLoading(false); 
+        }
+      }
+    };
+    reader.readAsArrayBuffer(file);
   };
 
   const downloadExcel = () => {
     const flattenedData = contractData.flatMap((item) => {
-      return item.milestoneAmount.map((yearData: any) => {
+      const { _id, __v, milestoneAmount, ...rest } = item; 
+      return milestoneAmount.map((yearData: any) => {
         return {
-          ...item,
+          ...rest,
           year: yearData.year,
-          revision: yearData.revision,
+          PORevision:
+            yearData.revision === 0
+              ? "Original"
+              : `Revision ${yearData.revision}`,
           ...yearData.month,
         };
       });
@@ -188,6 +205,29 @@ function DemandView() {
 
   return (
     <>
+      {uploadLoading || uploadMessage ? (
+        <Modal show centered>
+          <Modal.Body>
+            {uploadLoading ? (
+              <div className="text-center">
+                <Spinner animation="border" role="status">
+                  <span className="visually-hidden">Loading...</span>
+                </Spinner>
+                <p>Processing your upload, please wait...</p>
+              </div>
+            ) : (
+              <p className="text-center">{uploadMessage}</p>
+            )}
+          </Modal.Body>
+          {!uploadLoading && (
+            <Modal.Footer>
+              <Button variant="secondary" onClick={() => setUploadMessage("")}>
+                Close
+              </Button>
+            </Modal.Footer>
+          )}
+        </Modal>
+      ) : null}
       <ContractManagementModal
         showModal={showModal}
         onClose={() => handleCloseModel()}
@@ -208,22 +248,22 @@ function DemandView() {
             className="bi bi-download edit-btn mx-2"
             onClick={downloadExcel}
           ></i>
-          {/* <input
-                  type="file"
-                  accept=".xlsx, .xls"
-                  onChange={handleBulkUpload}
-                  style={{ display: "none" }}
-                  id="bulkUpload"
-                /> */}
+          <input
+            type="file"
+            accept=".xlsx, .xls"
+            onChange={handleBulkUpload}
+            style={{ display: "none" }}
+            id="bulkUpload"
+          />
           <label htmlFor="bulkUpload" className="mx-2">
-            <i className="bi bi-upload edit-btn" onClick={handleBulkUpload}></i>
+            <i className="bi bi-upload edit-btn"></i>
           </label>
         </div>
       </div>
-      {loading ? (
+      {tableLoading ? (
         <div className="text-center">
           <Spinner animation="border" role="status">
-            <span className="visually-hidden">Loading...</span>
+            <span className="visually-hidden">tableLoading...</span>
           </Spinner>
         </div>
       ) : (

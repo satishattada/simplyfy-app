@@ -2,6 +2,8 @@ import { atom } from 'jotai';
 
 export interface ContractReq {
    month: { [s: string]: unknown; } | ArrayLike<unknown>;
+   _id?: string;
+   __v?: number;
    id: number;
    bpSubPortfolio: string;
    contractName: string;

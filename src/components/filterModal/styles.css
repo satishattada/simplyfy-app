@@ -1,0 +1,8 @@
+.inputSelectField{
+    width: 100%;
+}
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Creates 2 columns */
+    gap: 10px; /* Adds space between grid items */
+  }

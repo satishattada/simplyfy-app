@@ -11,7 +11,7 @@ import selectOptions from "../../data/dropDown";
 import bpReportingFields from "../../data/reportingField";
 import Table from "react-bootstrap/Table";
 import { FaTrash } from "react-icons/fa";
-import { format } from 'date-fns';
+import { format } from "date-fns";
 import contractsService from "../../services/contractsService";
 const ContractManagementModal = ({
   showModal,
@@ -90,8 +90,7 @@ const ContractManagementModal = ({
           .map((item) => item.year)
       ),
     ];
-    if (
-      modalType !== "add" && !selectedYear) {
+    if (modalType !== "add" && !selectedYear) {
       setSelectedYear(Number(years[0]));
     }
   }, [formData]);
@@ -127,55 +126,54 @@ const ContractManagementModal = ({
     setSelectedYear(Number(year));
   };
   const setSelectedDateForStartDate = (date, name) => {
-    const formattedDate = format(date, 'dd-MMM-yy');
+    const formattedDate = format(date, "dd-MMM-yy");
     const dt = formattedDate.split("-")[2];
-      let tempDt = dt?.length === 2 ? 20 + dt : dt;
-      const newYear = new Date(formattedDate).getFullYear();
-      if (name === "contractStartDate") {
-          setSelectedYear(Number(tempDt));
-          const currentYear = new Date(formData.contractStartDate).getFullYear();
-         if (newYear !== currentYear) {
-           setMilestoneAmountData(0,tempDt);
-         }
-      } else if(name === "contractEndDate"){
-        const currentYear = new Date(formData.contractEndDate).getFullYear();
-        if (newYear !== currentYear) {  
-          setMilestoneAmountData(0, tempDt);
-        }
+    let tempDt = dt?.length === 2 ? 20 + dt : dt;
+    const newYear = new Date(formattedDate).getFullYear();
+    if (name === "contractStartDate") {
+      setSelectedYear(Number(tempDt));
+      const currentYear = new Date(formData.contractStartDate).getFullYear();
+      if (newYear !== currentYear) {
+        setMilestoneAmountData(0, tempDt);
       }
-    
+    } else if (name === "contractEndDate") {
+      const currentYear = new Date(formData.contractEndDate).getFullYear();
+      if (newYear !== currentYear) {
+        setMilestoneAmountData(0, tempDt);
+      }
+    }
   };
-const setMilestoneAmountData =(rev, yr)=>{
-  setFormData((prevData) => ({
-    ...prevData,
-    milestoneAmount: [
-      ...prevData.milestoneAmount,
-      {
-        revision: rev,
-        year: Number(yr),
-        month: {
-          jan: "",
-          feb: "",
-          mar: "",
-          apr: "",
-          may: "",
-          jun: "",
-          jul: "",
-          aug: "",
-          sep: "",
-          oct: "",
-          nov: "",
-          dec: "",
+  const setMilestoneAmountData = (rev, yr) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      milestoneAmount: [
+        ...prevData.milestoneAmount,
+        {
+          revision: rev,
+          year: Number(yr),
+          month: {
+            jan: "",
+            feb: "",
+            mar: "",
+            apr: "",
+            may: "",
+            jun: "",
+            jul: "",
+            aug: "",
+            sep: "",
+            oct: "",
+            nov: "",
+            dec: "",
+          },
         },
-      },
-    ],
-  }));
-}
+      ],
+    }));
+  };
   const handleChange = (e, name) => {
     const value = e.target ? e.target.value : e;
     setFormData((prevData) => ({
       ...prevData,
-      [name]: value instanceof Date ? format(value, 'dd-MMM-yy') : value,
+      [name]: value instanceof Date ? format(value, "dd-MMM-yy") : value,
     }));
     const error = validateField(name, value);
     setErrors({
@@ -228,8 +226,9 @@ const setMilestoneAmountData =(rev, yr)=>{
       value !== ""
     ) {
       return true;
-    }
-    if (name === "contractFGID" && value !== "") {
+    } else if (name === "contractFGID" && value !== "") {
+      return true;
+    } else if (name === "POAmountFG" && value !== "") {
       return true;
     }
     // else if(name === "contractStartDate" && selectedRevision?.length === 1 && value !== ""){
@@ -284,6 +283,7 @@ const setMilestoneAmountData =(rev, yr)=>{
   };
 
   const handleMonthValueChange = (updatedData) => {
+    const FGAmount = calculateFGAmount(updatedData);
     setFormData((prevData) => {
       // const updatedMilestoneAmount = [...prevData.milestoneAmount];
       // if(updatedMilestoneAmount[yearIndex].year !== selectedYear){
@@ -291,10 +291,29 @@ const setMilestoneAmountData =(rev, yr)=>{
       // }else{
       //   updatedMilestoneAmount[yearIndex].month[monthKey] = newYear;
       // }
-      return { ...prevData, milestoneAmount: updatedData };
+      return {
+        ...prevData,
+        milestoneAmount: updatedData,
+        POAmountFG: FGAmount,
+      };
     });
   };
-
+  const calculateFGAmount = (updatedData) => {
+    const lastRevision = updatedData[updatedData.length - 1];
+    const totalAmount = Object.values(lastRevision.month).reduce(
+      (acc, month) => {
+        const cleanedAmount = month.trim().replace(/,/g, ""); // Remove commas
+        const amount = parseFloat(cleanedAmount);
+        return acc + (isNaN(amount) || amount <= 0 ? 0 : amount); // Only sum valid amounts
+      },
+      0
+    );
+    const formattedTotalAmount = totalAmount.toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+    return formattedTotalAmount;
+  };
   const findDuplicateYears = () => {
     const years = [
       ...new Set(
@@ -396,7 +415,11 @@ const setMilestoneAmountData =(rev, yr)=>{
         milestone.year !== "" &&
         Object.values(milestone.month).some((value) => value !== "")
     );
-
+    const calculatedFGAmount = calculateFGAmount(formData.milestoneAmount);
+    if (calculatedFGAmount !== formData.POAmountFG) {
+      alert("Milestone amount and FG amount are not same.");
+      return;
+    }
     // const updatedFormData = {
     //   ...formData,
     //   milestoneAmount: cleanedMilestoneAmount,
@@ -517,7 +540,11 @@ const setMilestoneAmountData =(rev, yr)=>{
   //   });
   // };
   const validateStartAndEndDate = () => {
-    if (!selectedYear && !formData.contractStartDate && !formData.contractEndDate) {
+    if (
+      !selectedYear &&
+      !formData.contractStartDate &&
+      !formData.contractEndDate
+    ) {
       alert("Please fill the contract start date and end date first.");
       return;
     }
@@ -637,7 +664,7 @@ const setMilestoneAmountData =(rev, yr)=>{
                               key={field.name}
                               field={field}
                               formData={formData}
-                             // handleChange={handleChange}
+                              // handleChange={handleChange}
                               isCalendarOpen={isCalendarOpen}
                               handleCalendarClick={handleCalendarClick}
                               handleDateChange={handleDateChange}

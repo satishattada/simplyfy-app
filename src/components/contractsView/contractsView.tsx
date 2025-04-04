@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import "./styles.css";
 import Table from "react-bootstrap/Table";
 import { Pagination, Spinner } from "react-bootstrap";
-import { Form, InputGroup, Button } from "react-bootstrap";
-import { FaSearch, FaTimes } from "react-icons/fa";
+import { Button } from "react-bootstrap";
+import { FaFilter } from "react-icons/fa";
 import contractsService from "../../services/contractsService";
 import SearchComponent from "../search/searchComponent";
 import { contractDataAtom, ContractReq } from "../../atoms/contractAtoms";
@@ -11,6 +11,8 @@ import { useAtom } from "jotai";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import ContractManagementModal from "../contractManagementModal/contractManagementModal";
+import DownloadContractModal from "../downloadContractModal/downloadContractModal";
+import FilterModal from "../filterModal/filterModal";
 import transformContractData from "../../helper/helper";
 
 function DemandView() {
@@ -27,7 +29,8 @@ function DemandView() {
   const [totalPages, setTotalPages] = useState(1);
   const [contractData, setContractData] = useAtom(contractDataAtom);
   const [loading, setLoading] = useState<boolean>(true);
-
+  const [showDownloadModal, setShowDownloadModal] = useState<boolean>(false);
+  const [showFilterModal, setShowFilterModal] = useState<boolean>(false);
   const handleSearchChange = (query: string) => {
     setQuery(query);
   };
@@ -37,6 +40,10 @@ function DemandView() {
   }, []);
 
   useEffect(() => {
+    const searchTerms = query
+      .split(/[\s,]+/)
+      .map((term) => term.toLowerCase().trim())
+      .filter(Boolean);
     if (query === "" || query === undefined) {
       const startIndex = (currentPage - 1) * itemsPerPage;
       const currentItems = contractData.slice(
@@ -47,21 +54,26 @@ function DemandView() {
       setTotalPages(Math.ceil(contractData.length / itemsPerPage));
     } else {
       // Filter data based on the query
+      console.log("contractData", contractData);
       const filtered =
         contractData &&
-        contractData?.filter(
-          (item: any) =>
-            item.contractName?.toLowerCase().includes(query?.toLowerCase()) ||
-            item.bpSubPortfolio?.toLowerCase().includes(query?.toLowerCase()) ||
-            item.contractType?.toLowerCase().includes(query?.toLowerCase()) ||
-            item.teamType?.toLowerCase().includes(query?.toLowerCase()) ||
-            item.referencePO?.toString().includes(query?.toLowerCase()) ||
-            item.contractCurrency
-              ?.toLowerCase()
-              .includes(query?.toLowerCase()) ||
-            item.contractFGID?.toLowerCase().includes(query?.toLowerCase()) ||
-            item.revenueType?.toLowerCase().includes(query?.toLowerCase())
-        );
+        contractData?.filter((item: any) => {
+          return searchTerms.some(
+            (term) =>
+              item.contractName?.toLowerCase().includes(term?.toLowerCase()) ||
+              item.bpSubPortfolio
+                ?.toLowerCase()
+                .includes(term?.toLowerCase()) ||
+              item.contractType?.toLowerCase().includes(term?.toLowerCase()) ||
+              item.teamType?.toLowerCase().includes(term?.toLowerCase()) ||
+              item.referencePO?.toString().includes(term?.toLowerCase()) ||
+              item.contractCurrency
+                ?.toLowerCase()
+                .includes(term?.toLowerCase()) ||
+              item.contractFGID?.toLowerCase().includes(term?.toLowerCase()) ||
+              item.revenueType?.toLowerCase().includes(term?.toLowerCase())
+          );
+        });
       const startIndex = (currentPage - 1) * itemsPerPage;
       const currentItems = filtered.slice(
         startIndex,
@@ -96,13 +108,20 @@ function DemandView() {
     setShowModal(false);
     setModalData({});
   };
-
+  const handleCloseDownloadModal = () => {
+    setShowDownloadModal(false);
+  };
   const handleFetchData = () => {
     setLoading(true);
     contractsService
       .getContractsData()
       .then((resp) => {
         const reponse = resp as ContractReq[];
+        reponse.sort((a, b) => {
+          const dateA: any = new Date(a.contractStartDate);
+          const dateB: any = new Date(b.contractStartDate);
+          return dateB - dateA;
+        });
         setContractData(reponse);
         setTotalItems(reponse.length);
         setTotalPages(Math.ceil(reponse.length / itemsPerPage));
@@ -159,7 +178,23 @@ function DemandView() {
   };
 
   const downloadExcel = () => {
-    const flattenedData = contractData.flatMap((item) => {
+    setShowDownloadModal(true);
+  };
+  const filterDateRange = (dateVal: any) => {
+    const start = new Date(dateVal.filterStartDate); // Convert start date string to Date object
+    const end = new Date(dateVal.filterEndDate); // Convert end date string to Date object
+
+    return contractData.filter((contract) => {
+      const contractStart = new Date(contract.contractStartDate); // Parse contract start date
+      const contractEnd = new Date(contract.contractEndDate); // Parse contract end date
+
+      // Check if contract falls within the given date range
+      return contractStart >= start && contractEnd <= end;
+    });
+  };
+  const downloadFilterDateRangeData = (dateVal: any) => {
+    const data = filterDateRange(dateVal);
+    const flattenedData = data.flatMap((item) => {
       return item.milestoneAmount.map((yearData: any) => {
         return {
           ...item,
@@ -176,7 +211,6 @@ function DemandView() {
     const blob = new Blob([s2ab(wbout)], { type: "application/octet-stream" });
     saveAs(blob, `contracts.xls`);
   };
-
   const s2ab = (s: string) => {
     const buf = new ArrayBuffer(s.length);
     const view = new Uint8Array(buf);
@@ -185,7 +219,42 @@ function DemandView() {
     }
     return buf;
   };
+  const handleCloseFilterModal = () => {
+    setShowFilterModal(false);
+  };
+  const handleFilter = () => {
+    setShowFilterModal(true);
+  };
+  const tempfun = (selectedFilter: any) => {
+    return contractData.filter((contract) => {
+      return Object.keys(selectedFilter).every((filterKey) => {
+        const selectedItems =
+          Array.isArray(selectedFilter[filterKey]) &&
+          selectedFilter[filterKey].length > 0
+            ? selectedFilter[filterKey].map(
+                (item: any, index: any) => item[index]?.name
+              )
+            : null;
+        console.log("selectedItems...................", selectedItems);
+        if (!selectedItems) return true;
+        return selectedItems.includes(contract[filterKey as keyof ContractReq]);
+      });
+    });
+  };
+  const filterSelectedData = (selectedFilter: any) => {
+    console.log("selectedFilter", selectedFilter);
+    const temp = tempfun(selectedFilter);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const currentItems = temp.slice(startIndex, startIndex + itemsPerPage);
 
+    console.log("temp.length", temp.length);
+    setContractData(temp);
+    setFilteredData(currentItems);
+    setTotalPages(Math.ceil(temp.length / itemsPerPage));
+    console.log("totalPages value is...........", totalPages);
+
+    console.log("temp value is...........", currentItems);
+  };
   return (
     <>
       <ContractManagementModal
@@ -197,8 +266,25 @@ function DemandView() {
         }
         onFetchData={() => handleFetchData()}
       />
+      <DownloadContractModal
+        showDownloadModal={showDownloadModal}
+        onClose={() => handleCloseDownloadModal()}
+        downloadFilterDateRangeData={(dateVal: any) =>
+          downloadFilterDateRangeData(dateVal)
+        }
+      />
+      <FilterModal
+        showFilterModal={showFilterModal}
+        onClose={() => handleCloseFilterModal()}
+        filterSelectedData={(filterFormData: any) =>
+          filterSelectedData(filterFormData)
+        }
+      />
       <div className="d-flex justify-content-between mt-5 mb-4">
-        <SearchComponent onSearch={handleSearchChange} />
+        <div className="d-flex align-items-center">
+          <SearchComponent onSearch={handleSearchChange} />
+          <FaFilter onClick={handleFilter} />
+        </div>
         <div className="d-flex align-items-center">
           <i
             className="bi bi-plus-circle edit-btn mx-2"

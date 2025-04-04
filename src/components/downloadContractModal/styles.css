@@ -1,0 +1,12 @@
+.inputField{
+    display: inline;
+}
+.modal-header .modal-title.h4{
+    font-size: larger;
+    padding: 0 30%;
+}
+.modal-content .modal-footer{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

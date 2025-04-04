@@ -2,8 +2,8 @@
     border: 0.5px solid;
    
   }
-  .search-box .input-group{
-    width: 125%;
+  .search-box{
+    margin-right: 16px;
   }
   .input-group .form-control,
   .input-group .btn-outline {

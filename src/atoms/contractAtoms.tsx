@@ -14,6 +14,7 @@ export interface ContractReq {
    revenueType: string;
    contractFGID: number;
    contractStartDate: number;
+   contractEndDate: number;
    contractCurrency: string;
    referencePO: number;
    POAmountOMS: string;
